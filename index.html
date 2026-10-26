@@ -192,6 +192,88 @@
   .confetti { position: fixed; top: -40px; font-size: 26px; pointer-events: none; animation: fall linear forwards; z-index: 5; }
   @keyframes fall { to { transform: translateY(110vh) rotate(540deg); } }
 
+  /* ---------- 모둠 대결 ---------- */
+  .team-names { display: flex; flex-wrap: wrap; gap: 8px; width: 100%; }
+  .team-names label { display: flex; align-items: center; gap: 4px; border-radius: 14px; padding: 4px 6px 4px 10px; font-size: 20px; }
+  .team-names input { width: 92px; border: none; background: rgba(255,255,255,.8); border-radius: 10px; padding: 6px 8px; font-family: "Jua"; font-size: 17px; color: var(--ink); outline: none; }
+  body.team .wrap { max-width: 1240px; padding-top: 12px; }
+  body.team .dots { margin-bottom: 10px; }
+  .team-bar { display: grid; grid-template-columns: repeat(var(--n, 4), 1fr); gap: 10px; margin-bottom: 14px; }
+  .team {
+    border: 4px solid transparent; border-radius: 22px; padding: 8px 6px 10px; text-align: center;
+    box-shadow: 0 6px 0 rgba(0,0,0,.08); transition: transform .15s, opacity .2s, border-color .15s; position: relative;
+  }
+  .team .ti { font-size: 30px; line-height: 1.1; }
+  .team .tn { font-size: 19px; }
+  .team .ts { font-family: "Jua"; font-size: 30px; line-height: 1.1; }
+  .team .tb { display: inline-block; margin-top: 4px; background: rgba(255,255,255,.85); border-radius: 999px; padding: 2px 12px; font-size: 15px; }
+  .team:active { transform: translateY(3px); }
+  .team.buzz { border-color: var(--ink); transform: translateY(-4px) scale(1.04); animation: glow 1s infinite alternate; }
+  @keyframes glow { to { box-shadow: 0 0 0 6px rgba(255,176,138,.45), 0 6px 0 rgba(0,0,0,.08); } }
+  .team.out { opacity: .4; filter: grayscale(.7); }
+  .team.win { border-color: var(--good); }
+  .team .plus { position: absolute; top: -14px; right: 6px; font-family: "Jua"; font-size: 24px; color: var(--good); animation: rise 1.2s ease-out forwards; }
+  @keyframes rise { from { transform: translateY(10px); opacity: 0; } 30% { opacity: 1; } to { transform: translateY(-18px); opacity: 0; } }
+  .team-bar.nudge { animation: shake .35s; }
+  .buzz-msg { border-radius: 20px; padding: 12px 14px; text-align: center; font-family: "Jua"; font-size: 22px; animation: pop .25s ease-out; display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; }
+  .buzz-msg button { border: none; background: rgba(255,255,255,.85); border-radius: 999px; padding: 5px 12px; font-size: 15px; }
+  body.team .choices.wait .choice { opacity: .55; }
+  body.team .canvas-box { aspect-ratio: auto; height: min(48vh, 560px); }
+
+  .podium { display: flex; align-items: flex-end; justify-content: center; gap: 12px; margin: 10px 0 20px; min-height: 260px; }
+  .pod { width: min(30%, 200px); text-align: center; animation: bounce .9s ease-out both; }
+  .pod .pi { font-size: 46px; line-height: 1.1; }
+  .pod .pn { font-family: "Jua"; font-size: 22px; }
+  .pod .ps { font-size: 16px; color: var(--ink-soft); margin-bottom: 6px; }
+  .pod .block { border-radius: 20px 20px 8px 8px; display: grid; place-items: center; font-family: "Jua"; font-size: 40px; color: #fff; box-shadow: var(--shadow); }
+  .rank-list { display: grid; gap: 8px; }
+  .rank { display: grid; grid-template-columns: 48px 44px 1fr auto; gap: 10px; align-items: center; border-radius: 16px; padding: 10px 14px; }
+  .rank .rk { font-family: "Jua"; font-size: 24px; text-align: center; }
+  .rank .ri { font-size: 30px; text-align: center; }
+  .rank .rn { font-family: "Jua"; font-size: 21px; }
+  .rank .rn small { font-family: "Gowun Dodum"; font-size: 14px; color: var(--ink-soft); margin-left: 6px; }
+  .rank .rs { font-family: "Jua"; font-size: 26px; }
+  .sub-h { text-align: center; font-size: 22px; margin: 24px 0 10px; }
+  .gcard .who { font-size: 14px; }
+
+  .link-btn { border: 2px solid var(--line); background: #fff; border-radius: 999px; padding: 7px 14px; font-size: 15px; }
+
+  /* ---------- 모둠 소개 ---------- */
+  .intro-cards { display: grid; grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr)); gap: 16px; max-width: 980px; margin: 0 auto; }
+  .icard {
+    border: 5px solid transparent; border-radius: 30px; padding: 18px 10px 16px; text-align: center;
+    box-shadow: var(--shadow); position: relative; transition: border-color .2s;
+  }
+  .icard .ino { position: absolute; top: 12px; left: 14px; background: rgba(255,255,255,.85); border-radius: 999px; padding: 3px 12px; font-size: 17px; }
+  .icard .iic { font-size: clamp(56px, 9vw, 92px); line-height: 1.1; }
+  .icard .inm { font-size: clamp(26px, 4vw, 38px); margin: 4px 0 8px; }
+  .icard .iok { display: inline-block; background: rgba(255,255,255,.85); border-radius: 999px; padding: 5px 16px; font-size: 18px; }
+  .icard.ok { border-color: var(--deep); }
+  .icard.ok .iok { background: var(--deep); color: #fff; }
+  .icard.hi { animation: hop .5s ease-out; }
+  @keyframes hop { 30% { transform: translateY(-14px) scale(1.04); } 60% { transform: translateY(2px); } }
+
+  /* ---------- 인쇄용 모둠 카드 ---------- */
+  #printArea { display: none; }
+  @media print {
+    @page { size: A4 portrait; margin: 8mm; }
+    body { background: #fff !important; }
+    .wrap, .confetti { display: none !important; }
+    #printArea { display: block; }
+    #printArea * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .pcard { height: 279mm; display: flex; flex-direction: column; page-break-after: always; break-after: page; }
+    .pcard:last-child { page-break-after: auto; break-after: auto; }
+    .pface { flex: 1; border-radius: 10mm; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; border: 1.5mm solid rgba(0,0,0,.06); }
+    .pflip { flex: 1; display: flex; transform: rotate(180deg); }
+    .pflip .pface { width: 100%; }
+    .pfold { text-align: center; color: #b9a896; font-size: 11pt; border-top: 0.6mm dashed #cdbba8; margin: 4mm 0; padding-top: 1mm; }
+    .pno { color: #fff; font-family: "Jua"; font-size: 22pt; border-radius: 999px; padding: 1mm 8mm; }
+    .pic { font-size: 120pt; line-height: 1.15; }
+    .pnm { font-family: "Jua"; font-size: 56pt; line-height: 1.1; color: var(--ink); }
+    .phint { font-size: 15pt; margin-top: 3mm; color: var(--ink-soft); }
+    .phint b { font-family: "Jua"; font-weight: normal; }
+  }
+
   .credit { text-align: center; color: var(--ink-soft); font-size: 13px; line-height: 1.6; margin: 26px 0 0; }
   .credit a { color: inherit; }
 
@@ -216,6 +298,20 @@
     .choice { padding: 11px 6px; min-height: 56px; }
     .go { padding: 11px 18px; font-size: 19px; }
     .gallery { grid-template-columns: repeat(2, 1fr); }
+    .team-bar { grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr)); gap: 6px; }
+    .team { padding: 6px 4px 8px; }
+    .team .ti { font-size: 22px; }
+    .team .tn { font-size: 16px; }
+    .team .ts { font-size: 22px; }
+    .team .tb { font-size: 12px; padding: 1px 6px; white-space: nowrap; }
+    body.team .canvas-box { height: min(80vw, 36vh); }
+    .podium { min-height: 210px; gap: 8px; }
+    .pod .pi { font-size: 34px; }
+    .pod .pn { font-size: 18px; }
+    .intro-cards { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .icard { padding: 14px 6px 12px; border-radius: 24px; }
+    .icard .ino { font-size: 13px; top: 8px; left: 8px; }
+    .icard .iok { font-size: 14px; padding: 4px 10px; }
   }
 </style>
 </head>
@@ -234,6 +330,25 @@
     <div id="topics" class="topics"></div>
 
     <div class="panel">
+      <div class="opt">
+        <span class="lb">놀이 방식</span>
+        <div class="chips" data-opt="mode">
+          <button class="chip on" data-v="solo">🙋 혼자 하기</button>
+          <button class="chip" data-v="team">👥 모둠 대결 <small>전자칠판 한 화면</small></button>
+        </div>
+      </div>
+      <div id="teamSetup" class="opt" hidden>
+        <span class="lb">모둠</span>
+        <div class="chips" data-opt="teams">
+          <button class="chip" data-v="2">2모둠</button>
+          <button class="chip" data-v="3">3모둠</button>
+          <button class="chip on" data-v="4">4모둠</button>
+          <button class="chip" data-v="5">5모둠</button>
+          <button class="chip" data-v="6">6모둠</button>
+        </div>
+        <div id="teamNames" class="team-names"></div>
+        <button id="printHome" class="link-btn">🖨 책상에 놓을 모둠 카드 인쇄</button>
+      </div>
       <div class="opt">
         <span class="lb">단계</span>
         <div class="chips" data-opt="level">
@@ -263,6 +378,21 @@
     <p class="credit">그림 데이터: Google <a href="https://quickdraw.withgoogle.com/data" target="_blank" rel="noopener">Quick, Draw! Dataset</a> (CC BY 4.0) · 그중 일부를 골라 이 파일 안에 넣었어요.</p>
   </section>
 
+  <!-- 모둠 소개 화면 -->
+  <section id="intro" hidden>
+    <div class="hero">
+      <span class="badge">시작하기 전에 확인해요</span>
+      <h1>우리 모둠 버튼은 <span class="hl">어디</span>일까?</h1>
+      <p>모둠마다 나와서 자기 모둠 카드를 한 번씩 눌러 보세요!</p>
+    </div>
+    <div id="introCards" class="intro-cards"></div>
+    <div class="btns">
+      <button id="introGo" class="go">모두 확인! 시작하기 🚀</button>
+      <button id="introPrint" class="go soft">🖨 모둠 카드 인쇄</button>
+      <button id="introBack" class="go soft">🏠 처음으로</button>
+    </div>
+  </section>
+
   <!-- 게임 화면 -->
   <section id="game" hidden>
     <div class="topbar">
@@ -272,6 +402,7 @@
       <span id="gScore" class="scorebox">0점</span>
     </div>
     <div id="dots" class="dots"></div>
+    <div id="teamBar" class="team-bar" hidden></div>
     <div class="play">
       <div class="board">
         <div class="canvas-box">
@@ -291,6 +422,7 @@
           <h2 id="qTitle">무엇을 그리고 있을까요?</h2>
           <span id="worth" class="worth"></span>
         </div>
+        <div id="buzzMsg" class="buzz-msg" hidden></div>
         <div id="choices" class="choices"></div>
         <div id="feedback" class="feedback" hidden></div>
       </div>
@@ -299,7 +431,13 @@
 
   <!-- 결과 화면 -->
   <section id="result" hidden>
-    <div class="res-hero">
+    <div id="teamResult" hidden>
+      <div class="res-hero"><h1>🏆 모둠 대결 결과</h1><p id="trSub"></p></div>
+      <div id="podium" class="podium"></div>
+      <div class="panel"><div id="rankList" class="rank-list"></div></div>
+      <h3 class="sub-h">어떤 그림이 나왔을까요?</h3>
+    </div>
+    <div id="soloHero" class="res-hero">
       <div class="medal"><div><div id="rTotal" class="big">0</div><small id="rMax">점</small></div></div>
       <h1 id="rTitle"></h1>
       <p id="rSub"></p>
@@ -312,6 +450,7 @@
     <p class="credit">그림 데이터: Google Quick, Draw! Dataset (CC BY 4.0)</p>
   </section>
 </div>
+<div id="printArea"></div>
 
 <script>
 /* Quick, Draw! simplified 데이터 일부 (각 획 = x,y 바이트 쌍을 16진수로 이어 붙인 문자열) */
@@ -347,8 +486,28 @@ function decode(pic) {
 }
 
 /* ---------- 첫 화면 ---------- */
-const opts = { topic: load("hq-topic", "all"), level: "1", rounds: "10", auto: "1" };
+const opts = { topic: load("hq-topic", "all"), level: "1", rounds: "10", auto: "1", mode: "solo", teams: "4" };
 const best = load("hq-best", {});
+
+/* 모둠 대결: 모둠 모양과 색 */
+const TEAMS = [
+  { ic: "🐯", nm: "호랑이", bg: "#ffd8c4", deep: "#ff9a73" },
+  { ic: "🐰", nm: "토끼", bg: "#ffdbe6", deep: "#ee8fae" },
+  { ic: "🐻", nm: "곰", bg: "#fff0b3", deep: "#e2b63f" },
+  { ic: "🐸", nm: "개구리", bg: "#cdeedc", deep: "#4fb889" },
+  { ic: "🐳", nm: "고래", bg: "#d4e9fb", deep: "#6aa8e0" },
+  { ic: "🦄", nm: "유니콘", bg: "#e6ddff", deep: "#9d86ea" },
+];
+const teamNames = load("hq-teamnames", TEAMS.map((t) => t.nm));
+function renderTeamSetup() {
+  $("teamSetup").hidden = opts.mode !== "team";
+  $("teamNames").innerHTML = TEAMS.slice(0, +opts.teams).map((t, k) =>
+    `<label style="background:${t.bg}">${t.ic}<input data-k="${k}" maxlength="8" value="${(teamNames[k] || t.nm).replace(/"/g, "&quot;")}"></label>`).join("");
+}
+$("teamNames").addEventListener("input", (e) => {
+  const k = e.target.dataset.k; if (k === undefined) return;
+  teamNames[+k] = e.target.value; save("hq-teamnames", teamNames);
+});
 
 function renderTopics() {
   $("topics").innerHTML = GROUPS.map((g) => {
@@ -369,6 +528,7 @@ document.querySelectorAll("[data-opt]").forEach((box) => {
     const c = e.target.closest(".chip"); if (!c) return;
     box.querySelectorAll(".chip").forEach((x) => x.classList.toggle("on", x === c));
     opts[box.dataset.opt] = c.dataset.v;
+    if (box.dataset.opt === "mode" || box.dataset.opt === "teams") renderTeamSetup();
   });
 });
 
@@ -378,24 +538,71 @@ let Q = null;          // 지금 문제
 let anim = 0;          // requestAnimationFrame 번호
 let autoTimer = 0, nextTimer = 0;
 
-function show(id) { ["home", "game", "result"].forEach((s) => ($(s).hidden = s !== id)); window.scrollTo(0, 0); }
+function show(id) { ["home", "intro", "game", "result"].forEach((s) => ($(s).hidden = s !== id)); window.scrollTo(0, 0); }
 
-function startGame() {
+function startGame(skipIntro) {
   const pool = opts.topic === "all" ? DATA : DATA.filter((c) => c.g === opts.topic);
   const rounds = Math.min(+opts.rounds, pool.length);
   G = {
     topic: opts.topic, level: +opts.level, auto: opts.auto === "1",
     cats: shuffle(pool).slice(0, rounds), i: 0, score: 0, log: [],
+    team: opts.mode === "team",
+    teams: opts.mode === "team" ? TEAMS.slice(0, +opts.teams).map((t, k) => ({ ...t, nm: (teamNames[k] || "").trim() || t.nm, score: 0, right: 0 })) : [],
   };
   const g = GROUPS.find((x) => x.id === G.topic);
   $("gTag").textContent = `${g.ic} ${g.nm} · ${G.level}단계`;
   $("gTag").style.background = g.bg;
   setAuto(G.auto);
   $("gScore").textContent = "0점";
+  document.body.classList.toggle("team", G.team);
+  $("gScore").hidden = G.team;
+  $("teamBar").hidden = !G.team;
+  $("hintBtn").hidden = G.team;
+  $("skipBtn").textContent = G.team ? "👀 정답 보기" : "⏭ 건너뛰기";
+  $("teamBar").style.setProperty("--n", G.teams.length);
+  $("teamBar").style.setProperty("--cols", G.teams.length <= 4 ? G.teams.length : 3);
+  if (G.team && !skipIntro) return showIntro();
+  play();
+}
+function play() {
   show("game");
   sizeCanvas();
   nextQuestion();
 }
+
+/* ---------- 시작 전 모둠 소개 ---------- */
+function showIntro() {
+  $("introCards").style.setProperty("--cols", G.teams.length <= 4 ? G.teams.length : 3);
+  $("introCards").innerHTML = G.teams.map((t, k) => `<button class="icard" data-k="${k}" style="background:${t.bg};--deep:${t.deep}">
+      <span class="ino">${k + 1}번</span>
+      <div class="iic">${t.ic}</div><div class="inm">${t.nm}</div>
+      <span class="iok">🙋 눌러 보세요!</span></button>`).join("");
+  show("intro");
+}
+$("introCards").addEventListener("click", (e) => {
+  const b = e.target.closest(".icard"); if (!b) return;
+  b.classList.remove("hi"); void b.offsetWidth; b.classList.add("hi", "ok");
+  b.querySelector(".iok").textContent = "✔ 우리 모둠 버튼!";
+});
+$("introGo").addEventListener("click", play);
+$("introBack").addEventListener("click", () => { document.body.classList.remove("team"); show("home"); });
+
+/* ---------- 책상에 세우는 모둠 카드 인쇄 (가운데를 접으면 앞뒤로 보임) ---------- */
+function printCards(list) {
+  $("printArea").innerHTML = list.map((t, k) => {
+    const face = `<div class="pface" style="background:${t.bg}">
+        <div class="pno" style="background:${t.deep}">${k + 1}번 버튼</div>
+        <div class="pic">${t.ic}</div><div class="pnm">${t.nm}</div>
+        <div class="phint">칠판에서 <b style="color:${t.deep}">${t.ic} ${t.nm}</b> 버튼을 눌러요!</div></div>`;
+    return `<div class="pcard"><div class="pflip">${face}</div><div class="pfold">✂ 여기를 접어요</div>${face}</div>`;
+  }).join("");
+  window.print();
+}
+function setupTeams() {
+  return TEAMS.slice(0, +opts.teams).map((t, k) => ({ ...t, nm: (teamNames[k] || "").trim() || t.nm }));
+}
+$("printHome").addEventListener("click", () => printCards(setupTeams()));
+$("introPrint").addEventListener("click", () => printCards(G.teams));
 
 /* 보기 만들기: 1단계는 다른 무리에서, 3단계는 같은 무리 위주 */
 function makeChoices(ans) {
@@ -415,12 +622,14 @@ function nextQuestion() {
   if (G.i >= G.cats.length) return finish();
   const cat = G.cats[G.i];
   const strokes = decode(pick(cat.p));
-  Q = { cat, strokes, shown: 0, prog: 0, drawing: false, done: false, hint: false, choices: makeChoices(cat) };
+  Q = { cat, strokes, shown: 0, prog: 0, drawing: false, done: false, hint: false, choices: makeChoices(cat), buzz: -1, out: [] };
   renderDots();
   $("feedback").hidden = true;
-  $("qTitle").textContent = "무엇을 그리고 있을까요?";
+  $("buzzMsg").hidden = true;
+  $("qTitle").textContent = G.team ? "알겠으면 모둠 버튼을 눌러요! 🙋" : "무엇을 그리고 있을까요?";
   const box = $("choices");
-  box.className = "choices" + (Q.choices.length === 3 ? " c3" : "");
+  box.className = "choices" + (Q.choices.length === 3 ? " c3" : "") + (G.team ? " wait" : "");
+  renderTeams();
   box.innerHTML = Q.choices.map((c, k) => `<button class="choice" data-k="${k}">${c.ko}</button>`).join("");
   $("pen").innerHTML = strokes.map(() => "<i></i>").join("");
   $("hintBtn").disabled = false;
@@ -439,6 +648,58 @@ function renderDots() {
   }).join("");
 }
 
+/* ---------- 모둠 점수판·손들기 ---------- */
+function renderTeams(plusAt, plus) {
+  if (!G.team) return;
+  $("teamBar").innerHTML = G.teams.map((t, k) => {
+    const out = Q && Q.out.includes(k), buzz = Q && Q.buzz === k;
+    const state = out ? "❌ 쉬어요" : buzz ? "✋ 고르는 중" : Q && Q.done ? "&nbsp;" : "🙋 손들기";
+    return `<button class="team${out ? " out" : ""}${buzz ? " buzz" : ""}" data-k="${k}" style="background:${t.bg}">
+      <div class="ti">${t.ic}</div><div class="tn">${t.nm}</div>
+      <div class="ts" style="color:${t.deep}">${t.score}</div>
+      <span class="tb">${state}</span>${plusAt === k ? `<span class="plus">+${plus}</span>` : ""}</button>`;
+  }).join("");
+}
+$("teamBar").addEventListener("click", (e) => {
+  const b = e.target.closest(".team"); if (b) buzz(+b.dataset.k);
+});
+document.addEventListener("keydown", (e) => {
+  if (!G || !G.team || $("game").hidden) return;
+  const k = +e.key - 1;
+  if (k >= 0 && k < G.teams.length) buzz(k);
+});
+/* 모둠이 손을 들면 그리기를 멈추고 그 모둠이 보기를 고른다 */
+function buzz(k) {
+  if (!Q || Q.done || Q.out.includes(k)) return;
+  if (Q.buzz === k) return unbuzz();
+  Q.buzz = k;
+  pauseDraw();
+  const t = G.teams[k], m = $("buzzMsg");
+  m.style.background = t.bg;
+  m.innerHTML = `${t.ic} ${t.nm} 모둠, 정답을 골라요! <span style="color:${t.deep}">+${worthNow()}점</span> <button id="unbuzz">✖ 취소</button>`;
+  m.hidden = false;
+  $("unbuzz").addEventListener("click", unbuzz);
+  $("choices").classList.remove("wait");
+  renderTeams();
+}
+function unbuzz() {
+  Q.buzz = -1;
+  $("buzzMsg").hidden = true;
+  $("choices").classList.add("wait");
+  renderTeams();
+  resumeDraw();
+}
+function pauseDraw() {
+  cancelAnimationFrame(anim); clearTimeout(autoTimer);
+  Q.drawing = false;
+  updateInfo();
+}
+function resumeDraw() {
+  if (Q.done) return;
+  if (Q.prog > 0) drawNextStroke();
+  else if (G.auto && Q.shown < Q.strokes.length) autoTimer = setTimeout(() => drawNextStroke(), LEVEL[G.level].gap);
+}
+
 /* 지금 맞히면 받을 점수: 첫 획 100점 → 마지막 획 50점, 힌트 쓰면 80% */
 function worthNow() {
   const n = Q.strokes.length, k = Math.max(1, Q.shown + (Q.prog > 0 ? 1 : 0));
@@ -451,7 +712,7 @@ function updateInfo() {
   $("strokePill").textContent = `획 ${k} / ${n}`;
   $("pen").querySelectorAll("i").forEach((el, j) => el.classList.toggle("on", j < k));
   $("worth").innerHTML = Q.done ? "&nbsp;" : `지금 맞히면 <b>+${worthNow()}점</b>${Q.hint ? " 💡" : ""}`;
-  $("nextStroke").disabled = Q.done || Q.drawing || Q.shown >= n;
+  $("nextStroke").disabled = Q.done || Q.drawing || Q.buzz >= 0 || Q.shown >= n;
 }
 
 /* ---------- 그리기 ---------- */
@@ -502,14 +763,17 @@ function paint() {
 
 /* 한 획을 점 단위로 이어 그리기 (속도는 단계에 따라) */
 function drawNextStroke(fast) {
-  if (!Q || (Q.done && !fast) || Q.drawing || Q.shown >= Q.strokes.length) return;
+  if (!Q || (Q.done && !fast) || (Q.buzz >= 0 && !fast) || Q.drawing || Q.shown >= Q.strokes.length) return;
   clearTimeout(autoTimer);
-  Q.drawing = true; Q.prog = 0.001;
+  Q.drawing = true;
   const pts = Q.strokes[Q.shown];
   const len = pts.reduce((L, p, i) => i ? L + Math.hypot(p[0] - pts[i - 1][0], p[1] - pts[i - 1][1]) : 0, 0);
   const pxPerMs = (fast ? 1.2 : 0.22 * LEVEL[G.level].speed);
   const dur = fast ? Math.min(260, Math.max(90, len / pxPerMs)) : Math.min(1600, Math.max(220, len / pxPerMs));
-  const t0 = performance.now(), q = Q;
+  // 멈췄던 획이면 멈춘 곳부터 이어 그리기
+  const r0 = pts.length > 1 ? Math.min(1, Q.prog / (pts.length - 1)) : 0;
+  Q.prog = Math.max(0.001, Q.prog);
+  const t0 = performance.now() - r0 * dur, q = Q;
   updateInfo();
   const step = (t) => {
     if (q !== Q) return;
@@ -545,12 +809,40 @@ $("nextStroke").addEventListener("click", () => drawNextStroke());
 /* ---------- 고르기 ---------- */
 $("choices").addEventListener("click", (e) => {
   const b = e.target.closest(".choice"); if (!b || Q.done) return;
+  if (G.team) return teamAnswer(Q.choices[+b.dataset.k], b);
   answer(Q.choices[+b.dataset.k], b);
 });
-function answer(c, btn) {
+/* 모둠 대결: 틀린 모둠은 이번 문제를 쉬고, 그림은 다시 이어서 그려진다 */
+function teamAnswer(c, btn) {
+  if (Q.buzz < 0) {
+    $("teamBar").classList.remove("nudge"); void $("teamBar").offsetWidth; $("teamBar").classList.add("nudge");
+    $("qTitle").textContent = "먼저 모둠 버튼을 눌러요! 🙋";
+    return;
+  }
+  const k = Q.buzz;
+  if (c === Q.cat) return answer(c, btn, k);
+  Q.out.push(k);
+  Q.buzz = -1;
+  btn.classList.add("wrong", "shake", "gone");
+  const t = G.teams[k], m = $("buzzMsg");
+  m.innerHTML = `${t.ic} ${t.nm} 모둠 아쉬워요! 다른 모둠 도전! 🙋`;
+  m.style.background = "var(--pink)";
+  $("choices").classList.add("wait");
+  $("qTitle").textContent = "알겠으면 모둠 버튼을 눌러요! 🙋";
+  renderTeams();
+  updateInfo();
+  // 모든 모둠이 틀렸거나 보기가 하나만 남으면 정답 공개
+  if (Q.out.length >= G.teams.length || $("choices").querySelectorAll(".choice:not(.gone)").length <= 1) return answer(null, null);
+  resumeDraw();
+}
+function answer(c, btn, team = -1) {
   const ok = c === Q.cat;
   const pts = ok ? worthNow() : 0;
   const k = Math.max(1, Q.shown + (Q.prog > 0 ? 1 : 0));
+  if (team >= 0) { G.teams[team].score += pts; G.teams[team].right++; }
+  Q.buzz = -1;
+  $("buzzMsg").hidden = true;
+  $("choices").classList.remove("wait");
   Q.done = true;
   clearTimeout(autoTimer);
   $("choices").classList.add("locked");
@@ -560,10 +852,11 @@ function answer(c, btn) {
   if (btn && !ok) { btn.classList.add("wrong", "shake"); }
   const stars = !ok ? 0 : pts >= 85 ? 3 : pts >= 65 ? 2 : 1;
   G.score += pts;
-  G.log[G.i] = { cat: Q.cat, strokes: Q.strokes, ok, pts, stars, k, n: Q.strokes.length, hint: Q.hint, skip: !btn };
+  G.log[G.i] = { cat: Q.cat, strokes: Q.strokes, ok, pts, stars, k, n: Q.strokes.length, hint: Q.hint, skip: !btn, team };
   $("gScore").textContent = G.score + "점";
   renderDots();
   updateInfo();
+  renderTeams(ok ? team : -1, pts);
   revealAll();
 
   const fb = $("feedback");
@@ -572,14 +865,21 @@ function answer(c, btn) {
   let msg;
   if (ok) msg = k <= 2 ? "와, 눈썰미 최고! 🎉" : k <= Q.strokes.length / 2 ? "빨리 알아챘어요! 👏" : "정답이에요! 😊";
   else msg = btn ? `아쉬워요! 정답은 <b>${Q.cat.ko}</b>` : `정답은 <b>${Q.cat.ko}</b>였어요`;
+  let top = `<span class="stars">${st}</span><span class="pts">+${pts}점</span>`;
+  if (G.team) {
+    const t = G.teams[team];
+    top = ok ? `<span class="stars">${t.ic}</span><span class="pts">${t.nm} 모둠 +${pts}점</span>` : `<span class="stars">🤔</span>`;
+    if (ok) { msg = `정답은 <b>${Q.cat.ko}</b>! ` + (k <= 2 ? "눈썰미 최고! 🎉" : "잘했어요! 👏"); fb.style.background = t.bg; }
+  }
+  if (!G.team || !ok) fb.style.background = "";
   const last = G.i + 1 >= G.cats.length;
-  fb.innerHTML = `<div class="fb-top"><span class="stars">${st}</span><span class="pts">+${pts}점</span></div>
+  fb.innerHTML = `<div class="fb-top">${top}</div>
     <div class="fb-msg">${msg}</div>
     <button id="goNext" class="go">${last ? "결과 보기 🏁" : "다음 문제 ▶"}<span class="bar"></span></button>`;
   fb.hidden = false;
   if (window.matchMedia("(max-width: 720px)").matches) fb.scrollIntoView({ behavior: "smooth", block: "nearest" });
   // 잠시 뒤 저절로 다음 문제로
-  const wait = ok ? 2200 : 3200;
+  const wait = (ok ? 2200 : 3200) + (G.team ? 1000 : 0);
   const bar = fb.querySelector(".bar");
   bar.animate([{ width: "0%" }, { width: "100%" }], { duration: wait, fill: "forwards" });
   $("goNext").addEventListener("click", goNext);
@@ -605,8 +905,8 @@ $("hintBtn").addEventListener("click", () => {
 });
 $("skipBtn").addEventListener("click", () => { if (!Q.done) answer(null, null); });
 
-$("quit").addEventListener("click", () => { clearTimers(); G = null; Q = null; renderTopics(); show("home"); });
-$("start").addEventListener("click", startGame);
+$("quit").addEventListener("click", () => { clearTimers(); G = null; Q = null; renderTopics(); document.body.classList.remove("team"); show("home"); });
+$("start").addEventListener("click", () => startGame());
 window.addEventListener("resize", () => { if (!$("game").hidden) sizeCanvas(); });
 
 /* ---------- 결과 ---------- */
@@ -618,20 +918,45 @@ function finish() {
   const ratio = G.score / max;
   $("rTitle").textContent = ratio >= 0.8 ? "그림 박사 등장! 🏆" : ratio >= 0.6 ? "멋진 눈썰미! 🌟" : ratio >= 0.4 ? "잘했어요! 👍" : "다음엔 더 잘할 수 있어요! 💪";
   $("rSub").textContent = `${n}문제 중 ${right}문제 정답`;
-  if (!best[G.topic] || G.score > best[G.topic]) { best[G.topic] = G.score; save("hq-best", best); }
+  if (!G.team && (!best[G.topic] || G.score > best[G.topic])) { best[G.topic] = G.score; save("hq-best", best); }
+  $("teamResult").hidden = !G.team;
+  $("soloHero").hidden = G.team;
+  if (G.team) renderRanking(n);
   const gal = $("gallery");
-  gal.innerHTML = G.log.map((r, k) => `<div class="gcard ${r.ok ? "ok" : "no"}">
+  gal.innerHTML = G.log.map((r, k) => {
+    const t = r.team >= 0 ? G.teams[r.team] : null;
+    const who = G.team ? (r.ok ? `<div class="who">${t.ic} ${t.nm} 모둠 · ${r.k}획째</div>` : `<div class="who">아무도 못 맞혔어요</div>`)
+      : `<div class="ds">${r.skip ? "건너뜀" : `${r.k}획 / ${r.n}획에서 고름`}${r.hint ? " · 💡" : ""}</div>`;
+    return `<div class="gcard ${r.ok ? "ok" : "no"}"${t ? ` style="background:${t.bg}"` : ""}>
       <canvas data-k="${k}" width="240" height="240"></canvas>
-      <div class="nm">${r.ok ? "⭕" : "❌"} ${r.cat.ko}</div>
-      <div class="ds">${r.skip ? "건너뜀" : `${r.k}획 / ${r.n}획에서 고름`}${r.hint ? " · 💡" : ""}</div>
-      <div class="p">+${r.pts}점</div></div>`).join("");
+      <div class="nm">${r.ok ? "⭕" : "❌"} ${r.cat.ko}</div>${who}
+      <div class="p">+${r.pts}점</div></div>`;
+  }).join("");
   gal.querySelectorAll("canvas").forEach((c) => {
     const r = G.log[+c.dataset.k], x = c.getContext("2d"), v = fitTo(r.strokes, c.width, c.height, 22);
     x.lineCap = "round"; x.lineJoin = "round"; x.lineWidth = 4; x.strokeStyle = "#5a4636";
     r.strokes.forEach((s) => strokePath(x, s, v, s.length));
   });
   show("result");
-  if (ratio >= 0.6) confetti();
+  if (G.team || ratio >= 0.6) confetti();
+}
+/* 순위: 점수가 같으면 같은 등수 */
+function renderRanking(n) {
+  const list = G.teams.slice().sort((a, b) => b.score - a.score);
+  list.forEach((t) => (t.rank = 1 + list.filter((o) => o.score > t.score).length));
+  const top = list[0];
+  const tie = list.filter((t) => t.rank === 1).length > 1;
+  $("trSub").textContent = `${n}문제 대결 끝! ` + (tie ? `${list.filter((t) => t.rank === 1).map((t) => t.nm).join(", ")} 모둠이 공동 1등이에요 🎉` : `${top.ic} ${top.nm} 모둠이 1등이에요 🎉`);
+  const medal = { 1: "🥇", 2: "🥈", 3: "🥉" };
+  const H = { 1: 170, 2: 120, 3: 86 };
+  const pod = list.slice(0, 3);
+  const order = pod.length === 3 ? [pod[1], pod[0], pod[2]] : pod.length === 2 ? [pod[1], pod[0]] : pod;
+  $("podium").innerHTML = order.map((t, i) => `<div class="pod" style="animation-delay:${i * 0.15}s">
+      <div class="pi">${t.ic}</div><div class="pn">${t.nm}</div><div class="ps">${t.score}점</div>
+      <div class="block" style="height:${H[Math.min(t.rank, 3)]}px;background:${t.deep}">${medal[t.rank] || t.rank}</div></div>`).join("");
+  $("rankList").innerHTML = list.map((t) => `<div class="rank" style="background:${t.bg}">
+      <span class="rk">${medal[t.rank] || t.rank + "등"}</span><span class="ri">${t.ic}</span>
+      <span class="rn">${t.nm}<small>${t.right}문제 정답</small></span><span class="rs">${t.score}점</span></div>`).join("");
 }
 function confetti() {
   const em = ["🎉", "⭐", "🌸", "✏️", "🎈"];
@@ -645,10 +970,11 @@ function confetti() {
     setTimeout(() => s.remove(), 5000);
   }
 }
-$("again").addEventListener("click", () => { opts.topic = G.topic; startGame(); });
-$("toHome").addEventListener("click", () => { renderTopics(); show("home"); });
+$("again").addEventListener("click", () => { opts.topic = G.topic; startGame(true); });
+$("toHome").addEventListener("click", () => { renderTopics(); document.body.classList.remove("team"); show("home"); });
 
 renderTopics();
+renderTeamSetup();
 </script>
 </body>
 </html>
