@@ -1176,12 +1176,15 @@ async function openHall(topic, level, rounds, period) {
   $("hShow").hidden = true; $("hEmpty").hidden = false; $("hEmpty").innerHTML = "⏳ 구글 시트에서 기록을 불러오는 중…";
   show("hall");
   try {
-    const res = await fetch(`${apiFull(api)}?action=records&t=${Date.now()}`).then((r) => r.json());
+    // 구글 서버가 가끔 답을 안 줄 때가 있어 15초가 지나면 그만두고 다시 불러오게 한다
+    const ac = new AbortController(), stop = setTimeout(() => ac.abort(), 15000);
+    const res = await fetch(`${apiFull(api)}?action=records&t=${Date.now()}`, { signal: ac.signal }).then((r) => r.json()).finally(() => clearTimeout(stop));
     if (!res.rows) { $("hEmpty").innerHTML = "서버 코드가 예전 것이에요.<br>앱스 스크립트에 <b>새 코드</b>를 붙여 넣고 <b>새 버전으로 배포</b>해 주세요."; return; }
     hallRows = res.rows;
     renderHall();
   } catch (e) {
-    $("hEmpty").innerHTML = "기록을 불러오지 못했어요 📶<br>인터넷을 확인하고 다시 열어 주세요.";
+    $("hEmpty").innerHTML = `기록을 불러오지 못했어요 📶<br><button id="hRetry" class="go">🔄 다시 불러오기</button>`;
+    $("hRetry").addEventListener("click", () => openHall($("hTopic").value, $("hLevel").value, $("hRounds").value, $("hPeriod").value));
   }
 }
 function renderHall() {
