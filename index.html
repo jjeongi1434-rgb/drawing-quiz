@@ -284,6 +284,8 @@
   .board-filter .sel-row { margin-bottom: 6px; }
   .board-empty { text-align: center; font-family: "Jua"; font-size: 22px; line-height: 1.6; background: #fff; border-radius: 28px; padding: 40px 16px; box-shadow: var(--shadow); margin: 16px 0; }
   .board-empty b { font-weight: normal; color: #e88c63; }
+  .live-rank { max-width: 620px; margin: 0 auto 18px; }
+  .live-rank .podium { transform: scale(0.8); transform-origin: bottom center; margin: -20px 0 0; }
   .rank.me { outline: 4px solid var(--ink); outline-offset: -2px; animation: pop .4s ease-out; }
   .tab-info { background: #fbf5ec; border-radius: 14px; padding: 9px 12px; font-size: 15.5px; line-height: 1.45; }
   .tab-info.good { background: var(--mint); font-family: "Jua"; font-size: 18px; }
@@ -441,7 +443,7 @@
         <div class="tab-fields">
           <label class="field"><span>서버 주소</span><input id="apiUrl" placeholder="https://script.google.com/macros/s/…/exec"></label>
           <div id="apiInfo" class="tab-info">구글 앱스 스크립트 <b>웹 앱 주소</b>를 한 번만 넣어 두면 돼요. (설정 안내서 참고)</div>
-          <div class="live-btns"><button id="apiTest" class="link-btn">🔌 연결 확인</button><button id="openLive" class="go">📡 실시간 대결방 열기</button></div>
+          <div class="live-btns"><button id="apiTest" class="link-btn">🔌 연결 확인</button><button id="openHall" class="link-btn">🏅 명예의 전당</button><button id="openLive" class="go">📡 실시간 대결방 열기</button></div>
         </div>
       </div>
       <div id="tabSetup" class="opt tab-setup" hidden>
@@ -544,7 +546,27 @@
       <div class="res-hero"><h1>🏆 실시간 대결 결과</h1><p id="lSub"></p></div>
       <div id="lPodium" class="podium"></div>
       <div class="panel"><div id="lRankList" class="rank-list"></div></div>
-      <div class="btns"><button id="lBack" class="go soft">📡 대결방으로 돌아가기</button></div>
+      <div class="btns"><button id="lBack" class="go soft">📡 대결방으로 돌아가기</button><button id="lHall" class="go soft">🏅 명예의 전당</button></div>
+    </div>
+  </section>
+
+  <!-- 명예의 전당 (구글 시트 [기록] 탭에 남은 지난 대결 점수) -->
+  <section id="hall" hidden>
+    <div class="topbar"><button id="hallHome" class="home-btn" title="처음으로">🏠</button><span class="tag">🏅 명예의 전당</span></div>
+    <div class="panel board-filter">
+      <div class="sel-row">
+        <label>기간 <select id="hPeriod"><option value="today">오늘</option><option value="week">최근 7일</option><option value="month">최근 30일</option><option value="all">전체</option></select></label>
+        <label>주제 <select id="hTopic"></select></label>
+        <label>단계 <select id="hLevel"><option value="*">모든 단계</option><option value="1">1단계</option><option value="2">2단계</option><option value="3">3단계</option></select></label>
+        <label>문제 수 <select id="hRounds"><option value="5">5문제</option><option value="10">10문제</option><option value="15">15문제</option></select></label>
+      </div>
+      <p class="step-p">실시간 대결을 끝까지 푼 점수예요. 이름마다 가장 높은 점수만 올라가요.</p>
+    </div>
+    <div id="hEmpty" class="board-empty" hidden></div>
+    <div id="hShow" hidden>
+      <div class="res-hero"><h1 id="hTitle"></h1><p id="hSub"></p></div>
+      <div id="hPodium" class="podium"></div>
+      <div class="panel"><div id="hRankList" class="rank-list"></div></div>
     </div>
   </section>
 
@@ -657,6 +679,11 @@
     </div>
     <div id="tabResult" hidden>
       <div id="tabCard" class="tab-card"></div>
+      <div id="liveRankBox" class="panel live-rank" hidden>
+        <h2 class="step-h">📡 우리 반 순위 <span id="lrUpd" class="upd"></span></h2>
+        <div id="lrPodium" class="podium"></div>
+        <div id="lrList" class="rank-list"></div>
+      </div>
     </div>
     <div id="soloHero" class="res-hero">
       <div class="medal"><div><div id="rTotal" class="big">0</div><small id="rMax">점</small></div></div>
@@ -695,6 +722,7 @@ const LEVEL = {
 const $ = (id) => document.getElementById(id);
 function load(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } }
 function save(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;");
 /* 탭 대결에서는 문제 번호로 정해지는 난수를 써서 모든 탭에 같은 문제가 나온다 */
 let rng = Math.random;
 function seeded(seed) {
@@ -968,19 +996,37 @@ async function liveFlush() {
   liveBusy = false;
   if (livePending && livePending !== body) liveFlush();
 }
-// 끝난 뒤: 점수가 다 올라가면 지금 몇 등인지 보여 주기
+// 끝난 뒤: 점수가 다 올라가면 반 전체 순위를 보여 주고, 친구들이 끝낼 때마다 4초마다 새로 고친다
+let liveRankTimer = 0;
 async function liveMyRank() {
+  clearInterval(liveRankTimer);
   for (let k = 0; k < 40 && !liveSentOk; k++) await new Promise((r) => setTimeout(r, 500));
-  const box = $("liveMine"); if (!box) return;
-  try {
-    const res = await apiGet(LIVE.api, LIVE.room);
-    const list = Object.entries(res.players || {}).map(([nm, p]) => ({ nm, ...p }));
-    const me = list.find((p) => p.nm === LIVE.name);
-    const rank = 1 + list.filter((p) => p.score > (me ? me.score : G.score)).length;
-    box.textContent = `✔ 칠판에 올라갔어요 · 지금 ${list.length}명 중 ${rank}등!`;
-  } catch (e) {
-    box.textContent = liveSentOk ? "✔ 칠판에 점수가 올라갔어요!" : "⏳ 인터넷이 연결되면 점수가 저절로 올라가요.";
-  }
+  let shown = false;
+  const tick = async () => {
+    const box = $("liveMine");
+    if ($("result").hidden || !box) { clearInterval(liveRankTimer); return; }
+    try {
+      const res = await apiGet(LIVE.api, LIVE.room);
+      if (!res.ok) throw 0;
+      const list = Object.entries(res.players || {}).map(([nm, p]) => ({ ...avatar(nm), raw: nm, nm: esc(nm), score: p.score, right: p.right, done: p.done }));
+      const ranked = renderRanking(list, "lrPodium", "lrList");
+      const me = ranked.find((p) => p.raw === LIVE.name);
+      [...$("lrList").children].forEach((row, i) => {
+        const p = ranked[i], rn = row.querySelector(".rn");
+        if (!p.done) rn.insertAdjacentHTML("beforeend", "<small>✏️ 푸는 중</small>");
+        if (p === me) { row.classList.add("me"); rn.insertAdjacentHTML("beforeend", "<small>⬅ 나</small>"); }
+      });
+      const left = list.filter((p) => !p.done).length;
+      box.textContent = `✔ 칠판에 올라갔어요 · 지금 ${list.length}명 중 ${me ? me.rank : "?"}등!`;
+      $("lrUpd").className = "upd"; $("lrUpd").textContent = left ? `· ${left}명이 아직 푸는 중` : "· 모두 끝났어요!";
+      $("liveRankBox").hidden = false; shown = true;
+    } catch (e) {
+      if (!shown) box.textContent = liveSentOk ? "✔ 칠판에 점수가 올라갔어요!" : "⏳ 인터넷이 연결되면 점수가 저절로 올라가요.";
+      else { $("lrUpd").className = "upd off"; $("lrUpd").textContent = "· 연결이 잠깐 끊겼어요"; }
+    }
+  };
+  await tick();
+  liveRankTimer = setInterval(tick, 4000);
 }
 
 /* 학생 탭: QR 주소(?live=방번호&api=…)로 열렸을 때 */
@@ -1119,7 +1165,54 @@ $("lBack").addEventListener("click", () => { $("lResult").hidden = true; $("live
 $("lNew").addEventListener("click", () => { if (confirm("새 방을 만들까요? 지금 방의 순위는 화면에서 사라져요.")) showLiveMake(); });
 $("liveHome").addEventListener("click", () => { clearInterval(livePoll); liveRoom = ""; renderTabSetup(); show("home"); });
 
-function show(id) { ["home", "live", "join", "board", "collect", "intro", "game", "result"].forEach((s) => ($(s).hidden = s !== id)); window.scrollTo(0, 0); }
+/* 명예의 전당: 시트 [기록] 탭의 줄 [시간, 방 번호, 이름, 점수, 맞힌 문제, 문제 수] */
+let hallRows = null;
+$("hTopic").innerHTML = `<option value="*">모든 주제</option>` + GROUPS.map((g) => `<option value="${g.id}">${g.ic} ${g.nm}</option>`).join("");
+async function openHall(topic, level, rounds, period) {
+  const api = $("apiUrl").value.trim();
+  if (!api) { $("apiInfo").className = "tab-info bad"; $("apiInfo").textContent = "서버 주소를 먼저 넣어요."; return; }
+  $("hTopic").value = topic; $("hLevel").value = String(level); $("hRounds").value = String(rounds); $("hPeriod").value = period;
+  hallRows = null;
+  $("hShow").hidden = true; $("hEmpty").hidden = false; $("hEmpty").innerHTML = "⏳ 구글 시트에서 기록을 불러오는 중…";
+  show("hall");
+  try {
+    const res = await fetch(`${apiFull(api)}?action=records&t=${Date.now()}`).then((r) => r.json());
+    if (!res.rows) { $("hEmpty").innerHTML = "서버 코드가 예전 것이에요.<br>앱스 스크립트에 <b>새 코드</b>를 붙여 넣고 <b>새 버전으로 배포</b>해 주세요."; return; }
+    hallRows = res.rows;
+    renderHall();
+  } catch (e) {
+    $("hEmpty").innerHTML = "기록을 불러오지 못했어요 📶<br>인터넷을 확인하고 다시 열어 주세요.";
+  }
+}
+function renderHall() {
+  if (!hallRows) return;
+  const period = $("hPeriod").value, topic = $("hTopic").value, level = $("hLevel").value, rounds = $("hRounds").value;
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const since = { today: +today, week: Date.now() - 7 * 864e5, month: Date.now() - 30 * 864e5, all: 0 }[period];
+  const best = {};
+  hallRows.forEach(([t, room, nm, score, right]) => {
+    const c = readCode(room);
+    if (!c || t < since || c.rounds !== rounds || (topic !== "*" && c.topic !== topic) || (level !== "*" && c.level !== level)) return;
+    if (!best[nm] || score > best[nm].score) best[nm] = { score, right, t, topic: c.topic };
+  });
+  const list = Object.entries(best).map(([nm, r]) => ({ ...avatar(nm), nm: esc(nm), ...r }));
+  $("hEmpty").hidden = list.length > 0; $("hShow").hidden = list.length === 0;
+  if (!list.length) { $("hEmpty").innerHTML = "🏅 이 조건으로 끝까지 푼 기록이 아직 없어요.<br><b>기간</b>이나 <b>주제</b>를 바꿔 보세요!"; return; }
+  const g = GROUPS.find((x) => x.id === topic);
+  $("hTitle").textContent = `${{ today: "오늘", week: "최근 7일", month: "최근 30일", all: "전체" }[period]} · ${g ? `${g.ic} ${g.nm}` : "모든 주제"} · ${level === "*" ? "모든 단계" : level + "단계"} · ${rounds}문제`;
+  const ranked = renderRanking(list, "hPodium", "hRankList");
+  $("hSub").textContent = `${list.length}명 · 1등은 ${ranked.filter((t) => t.rank === 1).map((t) => t.nm).join(", ")} 🎉`;
+  [...$("hRankList").children].forEach((row, i) => {
+    const r = ranked[i], d = new Date(r.t), tg = GROUPS.find((x) => x.id === r.topic);
+    row.querySelector(".rn").insertAdjacentHTML("beforeend", `<small>📅 ${d.getMonth() + 1}/${d.getDate()}${topic === "*" ? ` · ${tg.ic} ${tg.nm}` : ""}</small>`);
+  });
+}
+["hPeriod", "hTopic", "hLevel", "hRounds"].forEach((id) => $(id).addEventListener("change", renderHall));
+$("openHall").addEventListener("click", () => openHall(opts.topic, "*", opts.rounds, "week"));
+$("lHall").addEventListener("click", () => { const c = readCode(liveRoom); openHall(c.topic, c.level, c.rounds, "today"); });
+$("hallHome").addEventListener("click", () => { renderTabSetup(); show("home"); });
+
+function show(id) { ["home", "live", "join", "board", "collect", "intro", "game", "result", "hall"].forEach((s) => ($(s).hidden = s !== id)); window.scrollTo(0, 0); }
 
 function startGame(skipIntro) {
   let set = opts, tab = null;
@@ -1541,6 +1634,7 @@ function finish() {
   $("soloHero").hidden = G.team || !!G.tab;
   $("again").hidden = !!G.tab;
   if (G.team) $("trSub").textContent = `${n}문제 대결 끝! ` + winnerText(renderRanking(G.teams, "podium", "rankList"));
+  $("liveRankBox").hidden = true;
   if (G.tab) {
     const t = G.tab, g = GROUPS.find((x) => x.id === G.topic);
     $("tabCard").style.background = t.bg;
@@ -1548,7 +1642,7 @@ function finish() {
       <div class="tc-code">${t.live ? "대결방" : "문제 번호"} <b>${t.code}</b> · ${g.ic} ${g.nm} · ${G.level}단계</div>
       <div class="tc-score" style="color:${t.deep}">${G.score}<small>점</small></div>
       <div class="tc-sub">${n}문제 중 ${right}문제 정답${G.log.some((r) => r.hint) ? ` · 💡 ${G.log.filter((r) => r.hint).length}번` : ""}</div>
-      ${t.live ? `<div id="liveMine" class="tc-sub">⏳ 점수를 칠판에 보내는 중…</div><div class="tc-say">📺 칠판에서 순위를 확인해요!</div>`
+      ${t.live ? `<div id="liveMine" class="tc-sub">⏳ 점수를 칠판에 보내는 중…</div><div class="tc-say">📺 아래 순위는 친구들이 끝낼 때마다 바뀌어요!</div>`
         : `<div class="tc-say">🙋 선생님께 이 화면을 보여 주세요!</div>`}`;
     if (t.live) liveMyRank();
   }
