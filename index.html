@@ -323,6 +323,11 @@
   .sched-row button { border: none; background: #fff; border-radius: 999px; width: 34px; height: 34px; font-size: 16px; }
   .room-list { display: grid; gap: 8px; }
   .t-rooms { margin-top: 12px; display: grid; gap: 8px; }
+  .lv-h { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 10px; border-radius: 16px; padding: 10px 16px; margin-top: 6px;
+    font-family: "Jua"; font-size: 22px; border-left: 8px solid var(--lvd); }
+  .lv-h small { font-family: "Gowun Dodum"; font-size: 15px; opacity: .75; }
+  .lv-none { font-size: 15px; color: var(--ink-soft); padding: 2px 18px 6px; }
+  .lv-tag { display: inline-block; border-radius: 999px; padding: 1px 10px; font-family: "Jua"; font-size: 15px; background: #fff; margin: 0 2px; }
   .t-rooms-h { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-family: "Jua"; font-size: 19px; }
   .t-rooms-h .go { margin-left: auto; font-size: 17px; padding: 8px 16px; }
   .room-btn button.rgo { border: none; cursor: pointer; }
@@ -680,7 +685,7 @@
       <h2 class="step-h">대결방 만들기</h2>
       <div class="sel-row">
         <label>주제 <select id="lTopic"></select></label>
-        <label>단계 <select id="lLevel"><option value="1">1단계</option><option value="2">2단계</option><option value="3">3단계</option></select></label>
+        <label>단계 <select id="lLevel"><option value="1">🥉 1단계 브론즈</option><option value="2">🥇 2단계 골드</option><option value="3">💎 3단계 챌린저</option></select></label>
         <label>문제 수 <select id="lRounds"><option value="5">5문제</option><option value="10" selected>10문제</option><option value="15">15문제</option></select></label>
         <label>그림 <select id="lMix"><option value="1">아이마다 다르게</option><option value="0">모두 같게</option></select></label>
       </div>
@@ -1249,7 +1254,7 @@ function openJoin(room, api, mix) {
   LIVE = { room, api, name: "", mix };
   const g = GROUPS.find((x) => x.id === c.topic);
   $("jCode").textContent = room;
-  $("jSet").textContent = `${g.ic} ${g.nm} · ${c.level}단계 · ${c.rounds}문제 · ${mix ? "친구마다 다른 그림이 나와요!" : "모두 같은 그림이 나와요!"}`;
+  $("jSet").textContent = `${lvName(c.level)} · ${g.ic} ${g.nm} · ${c.rounds}문제 · ${mix ? "친구마다 다른 그림이 나와요!" : "모두 같은 그림이 나와요!"}`;
   $("jName").value = showNm(myKey());
   $("jInfo").className = "tab-info";
   $("jInfo").textContent = ME ? "등록한 이름으로 들어가요. 칠판에 내 점수가 실시간으로 나와요!" : "학번·이름을 먼저 등록해야 들어갈 수 있어요. 🏠 처음 화면에서 등록해 주세요.";
@@ -1484,6 +1489,15 @@ $("sList").addEventListener("click", (e) => {
 });
 { const d = new Date(); $("sDate").value = `${d.getFullYear()}-${two(d.getMonth() + 1)}-${two(d.getDate())}`; }
 
+/* 대결방 단계 이름 (쉬움 · 보통 · 어려움) — 게임 티어처럼 */
+const LV = {
+  1: { ic: "🥉", nm: "브론즈", say: "손풀기 구간 · 눈 감고도 깸", bg: "#f3e6da", deep: "#b0763f" },
+  2: { ic: "🥇", nm: "골드", say: "슬슬 진심 모드 · 방심하면 털림", bg: "#fff3c4", deep: "#d9a400" },
+  3: { ic: "💎", nm: "챌린저", say: "고인물 전용 · 자신 없으면 뒤로가기", bg: "#e4e6ff", deep: "#5b5fd6" },
+};
+const lvName = (l) => `${LV[l].ic} ${l}단계 ${LV[l].nm}`;
+const lvTag = (l) => `<span class="lv-tag" style="color:${LV[l].deep}">${lvName(l)}</span>`;
+
 /* 학생: 열린 대결방 목록 (4초마다 새로) */
 let roomTimer = 0;
 let tRoomList = [];
@@ -1502,17 +1516,22 @@ async function pollRooms() {
       box.innerHTML = tRoomList.length ? tRoomList.map((x) => {
         const c = readCode(x.room), g = GROUPS.find((y) => y.id === c.topic);
         return `<div class="room-btn" style="background:${g.bg}"><span class="ri">${g.ic}</span>
-          <span><b>${x.room}번 방</b>${g.nm} · ${c.level}단계 · ${c.rounds}문제 · 👥 ${x.n}명 · ${hm(x.t)}에 열림</span>
+          <span><b>${x.room}번 방</b>${lvTag(c.level)} ${g.nm} · ${c.rounds}문제 · 👥 ${x.n}명 · ${hm(x.t)}에 열림</span>
           <button class="rgo" data-close="${x.room}">✕ 닫기</button></div>`;
       }).join("") : `<div class="live-empty">${r.open === false ? "🔒 게임이 닫혀 있어서 열린 방이 안 보여요. (방은 연 지 3시간이 지나면 저절로 사라져요)" : "지금 열린 대결방이 없어요."}</div>`;
       roomTimer = setTimeout(pollRooms, 4000);
       return;
     }
-    box.innerHTML = r.rooms.length ? r.rooms.map((x) => {
-      const c = readCode(x.room); if (!c) return "";
-      const g = GROUPS.find((y) => y.id === c.topic);
-      return `<button class="room-btn" data-room="${x.room}" data-mix="${x.mix}" style="background:${g.bg}">
-        <span class="ri">${g.ic}</span><span><b>${x.room}번 방</b>${g.nm} · ${c.level}단계 · ${c.rounds}문제 · 👥 ${x.n}명</span><span class="rgo">들어가기 ➜</span></button>`;
+    // 단계별로 나눠 보여 주기: 🥉 브론즈 · 🥇 골드 · 💎 챌린저
+    const rooms = r.rooms.filter((x) => readCode(x.room));
+    box.innerHTML = rooms.length ? [1, 2, 3].map((l) => {
+      const mine = rooms.filter((x) => +readCode(x.room).level === l);
+      return `<div class="lv-h" style="background:${LV[l].bg};--lvd:${LV[l].deep}">${lvName(l)} <small>${LV[l].say}</small></div>` +
+        (mine.length ? mine.map((x) => {
+          const c = readCode(x.room), g = GROUPS.find((y) => y.id === c.topic);
+          return `<button class="room-btn" data-room="${x.room}" data-mix="${x.mix}" style="background:${g.bg}">
+            <span class="ri">${g.ic}</span><span><b>${x.room}번 방</b>${g.nm} · ${c.rounds}문제 · 👥 ${x.n}명</span><span class="rgo">들어가기 ➜</span></button>`;
+        }).join("") : `<div class="lv-none">아직 열린 방이 없어요</div>`);
     }).join("") : `<div class="live-empty">${r.open === false ? "🔒 지금은 닫혀 있어요." : "아직 열린 대결방이 없어요.<br>선생님이 방을 열면 여기에 나와요! ⏳"}</div>`;
   } catch (e) {
     box.innerHTML = `<div class="live-empty">대결방을 불러오지 못했어요 📶 다시 시도하는 중…</div>`;
@@ -1574,7 +1593,7 @@ $("lMake").addEventListener("click", async () => {
   liveRoom = makeCode($("lTopic").value, $("lLevel").value, $("lRounds").value);
   const g = GROUPS.find((x) => x.id === $("lTopic").value), url = joinUrl(liveRoom);
   $("lCode").textContent = liveRoom;
-  $("lSet").textContent = `${g.ic} ${g.nm} · ${$("lLevel").value}단계 · ${$("lRounds").value}문제 · ${$("lMix").value === "1" ? "아이마다 다른 그림" : "모두 같은 그림"}`;
+  $("lSet").textContent = `${lvName($("lLevel").value)} · ${g.ic} ${g.nm} · ${$("lRounds").value}문제 · ${$("lMix").value === "1" ? "아이마다 다른 그림" : "모두 같은 그림"}`;
   $("liveMake").hidden = true; $("liveRoom").hidden = false; $("lResult").hidden = true; $("liveCount").hidden = false;
   $("lQr").innerHTML = "⏳";
   try {
