@@ -236,6 +236,93 @@
   .sub-h { text-align: center; font-size: 22px; margin: 24px 0 10px; }
   .gcard .who { font-size: 14px; }
 
+  /* ---------- 탭 대결 ---------- */
+  .nudge { animation: shake .35s; }
+  .tab-setup { align-items: flex-start; }
+  .tab-fields { display: grid; gap: 10px; flex: 1; min-width: 240px; }
+  .animals { display: flex; gap: 8px; flex-wrap: wrap; }
+  .animal { width: 52px; height: 52px; border-radius: 16px; border: 3px solid transparent; font-size: 28px; padding: 0; transition: transform .12s; }
+  .animal.on { border-color: var(--deep); transform: scale(1.12); box-shadow: 0 4px 0 rgba(0,0,0,.1); }
+  .field { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .field span { font-family: "Jua"; font-size: 17px; min-width: 70px; }
+  .field input { flex: 1; min-width: 150px; border: 3px solid var(--line); background: #fffaf4; border-radius: 14px; padding: 9px 12px; font-family: "Jua"; font-size: 21px; color: var(--ink); outline: none; }
+  .field input:focus { border-color: var(--peach-deep); }
+  #tabCode { letter-spacing: 6px; }
+  .solo-field { flex: 1; max-width: 360px; }
+  /* ---------- 실시간 대결 ---------- */
+  .live-btns { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .live-btns .go { flex: 1; min-width: 200px; }
+  .live-grid { display: grid; grid-template-columns: minmax(260px, 0.8fr) 1.2fr; gap: 16px; align-items: start; }
+  .live-qr { text-align: center; }
+  .qr-say { font-family: "Jua"; font-size: 22px; margin-bottom: 8px; }
+  .qr-box { background: #fff; border-radius: 18px; padding: 10px; display: inline-block; border: 3px solid var(--line); min-width: 200px; min-height: 200px; }
+  .qr-box svg, .qr-box img { display: block; width: min(300px, 70vw); height: auto; }
+  .qr-box .qr-fail { font-size: 14px; color: var(--ink-soft); padding: 40px 10px; max-width: 240px; }
+  .live-code { font-family: "Jua"; font-size: 20px; margin-top: 10px; }
+  .live-code b { font-weight: normal; font-size: 44px; letter-spacing: 6px; display: block; line-height: 1.1; }
+  .live-set { font-family: "Jua"; font-size: 17px; color: var(--ink-soft); margin: 4px 0 10px; }
+  .upd { font-family: "Gowun Dodum"; font-size: 14px; color: var(--ink-soft); margin-left: 6px; }
+  .upd.off { color: #d1695c; }
+  .live-list { display: grid; gap: 8px; margin-bottom: 14px; }
+  .live-empty { text-align: center; color: var(--ink-soft); font-size: 17px; padding: 30px 10px; background: #fffaf4; border-radius: 18px; }
+  .lrow { display: grid; grid-template-columns: 44px 36px 1fr 120px 76px; gap: 8px; align-items: center; border-radius: 16px; padding: 8px 12px; transition: transform .3s; }
+  .lrow .lk { font-family: "Jua"; font-size: 21px; text-align: center; }
+  .lrow .li { font-size: 26px; text-align: center; }
+  .lrow .ln { font-family: "Jua"; font-size: 20px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .lrow .lp { height: 12px; border-radius: 99px; background: rgba(255,255,255,.8); overflow: hidden; position: relative; }
+  .lrow .lp i { position: absolute; inset: 0 auto 0 0; border-radius: 99px; transition: width .5s; }
+  .lrow .lpt { font-size: 12.5px; color: var(--ink-soft); text-align: center; margin-top: 2px; }
+  .lrow .ls { font-family: "Jua"; font-size: 23px; text-align: right; }
+  .lrow.up { animation: pop .4s ease-out; }
+  .live-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+  .live-actions .go { flex: 1; }
+  .join-panel { max-width: 560px; margin: 0 auto; display: grid; gap: 10px; }
+
+  .board-link { text-align: center; margin: 0 0 6px; }
+  .board-link .link-btn { font-family: "Jua"; font-size: 18px; padding: 9px 20px; background: var(--butter); border-color: #e9c95c; }
+  .board-filter { margin-bottom: 8px; }
+  .board-filter .sel-row { margin-bottom: 6px; }
+  .board-empty { text-align: center; font-family: "Jua"; font-size: 22px; line-height: 1.6; background: #fff; border-radius: 28px; padding: 40px 16px; box-shadow: var(--shadow); margin: 16px 0; }
+  .board-empty b { font-weight: normal; color: #e88c63; }
+  .rank.me { outline: 4px solid var(--ink); outline-offset: -2px; animation: pop .4s ease-out; }
+  .tab-info { background: #fbf5ec; border-radius: 14px; padding: 9px 12px; font-size: 15.5px; line-height: 1.45; }
+  .tab-info.good { background: var(--mint); font-family: "Jua"; font-size: 18px; }
+  .tab-info.bad { background: var(--pink); }
+  .tab-info b { font-weight: normal; font-family: "Jua"; }
+  .tab-card { max-width: 520px; margin: 4px auto 18px; border-radius: 34px; padding: 22px 18px; text-align: center; box-shadow: var(--shadow); animation: bounce .9s ease-out; }
+  .tc-ic { font-size: 74px; line-height: 1.1; }
+  .tc-nm { font-family: "Jua"; font-size: 36px; }
+  .tc-code { font-size: 16px; color: var(--ink-soft); margin: 4px 0 8px; }
+  .tc-code b { font-family: "Jua"; font-weight: normal; font-size: 22px; letter-spacing: 3px; color: var(--ink); }
+  .tc-score { font-family: "Jua"; font-size: 84px; line-height: 1; }
+  .tc-score small { font-size: 30px; margin-left: 4px; }
+  .tc-sub { font-family: "Jua"; font-size: 19px; margin-top: 6px; }
+  .tc-say { display: inline-block; margin-top: 14px; background: rgba(255,255,255,.85); border-radius: 999px; padding: 7px 18px; font-family: "Jua"; font-size: 18px; }
+
+  .collect-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
+  .step-h { margin: 0 0 10px; font-size: 24px; }
+  .step-p { margin: -4px 0 10px; color: var(--ink-soft); font-size: 15px; }
+  .sel-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+  .sel-row label { font-family: "Jua"; font-size: 16px; display: flex; align-items: center; gap: 6px; }
+  .sel-row select { font-family: "Jua"; font-size: 17px; border: 3px solid var(--line); border-radius: 12px; padding: 6px 8px; background: #fffaf4; color: var(--ink); }
+  .big-code { margin-top: 16px; background: var(--butter); border-radius: 24px; padding: 14px; text-align: center; animation: pop .3s ease-out; }
+  .big-code small { display: block; font-family: "Jua"; font-size: 18px; color: #a07a2c; }
+  .big-code b { display: block; font-family: "Jua"; font-weight: normal; font-size: clamp(56px, 9vw, 96px); letter-spacing: 10px; line-height: 1.1; }
+  .big-code span { font-family: "Jua"; font-size: 18px; }
+  .c-rows { display: grid; gap: 8px; margin-bottom: 14px; }
+  .c-row { display: grid; grid-template-columns: 40px 1fr 96px auto 34px; gap: 8px; align-items: center; border-radius: 16px; padding: 6px 12px; font-family: "Jua"; font-size: 17px; }
+  .c-row .ci { font-size: 28px; text-align: center; }
+  .c-row input { border: none; background: rgba(255,255,255,.85); border-radius: 10px; padding: 8px 10px; font-family: "Jua"; font-size: 19px; color: var(--ink); outline: none; min-width: 0; }
+  .c-row .cs { text-align: right; }
+  .c-del { width: 34px; height: 34px; border: none; border-radius: 50%; background: rgba(255,255,255,.7); font-size: 15px; color: var(--ink-soft); padding: 0; }
+  .c-del:hover { background: #fff; color: #d1695c; }
+  .c-add-row { display: flex; align-items: center; gap: 10px; margin: -4px 0 14px; }
+  .c-add { flex: 1; border: 3px dashed var(--line); background: #fffaf4; border-radius: 16px; padding: 10px; font-size: 19px; }
+  .c-add:hover { border-color: var(--peach-deep); }
+  .c-add:disabled { opacity: .45; cursor: default; }
+  .c-count { font-family: "Jua"; font-size: 17px; color: var(--ink-soft); white-space: nowrap; }
+  #collect .go { width: 100%; }
+
   .link-btn { border: 2px solid var(--line); background: #fff; border-radius: 999px; padding: 7px 14px; font-size: 15px; }
 
   /* ---------- 모둠 소개 ---------- */
@@ -308,6 +395,12 @@
     .podium { min-height: 210px; gap: 8px; }
     .pod .pi { font-size: 34px; }
     .pod .pn { font-size: 18px; }
+    .collect-grid, .live-grid { grid-template-columns: 1fr; }
+    .lrow { grid-template-columns: 34px 28px 1fr 70px 60px; padding: 6px 8px; gap: 6px; }
+    .lrow .ln { font-size: 17px; }
+    .lrow .ls { font-size: 19px; }
+    .animal { width: 46px; height: 46px; font-size: 25px; }
+    .tc-score { font-size: 68px; }
     .intro-cards { grid-template-columns: 1fr 1fr; gap: 10px; }
     .icard { padding: 14px 6px 12px; border-radius: 24px; }
     .icard .ino { font-size: 13px; top: 8px; left: 8px; }
@@ -335,7 +428,31 @@
         <div class="chips" data-opt="mode">
           <button class="chip on" data-v="solo">🙋 혼자 하기</button>
           <button class="chip" data-v="team">👥 모둠 대결 <small>전자칠판 한 화면</small></button>
+          <button class="chip" data-v="tab">📱 탭 대결 <small>모둠마다 탭 하나</small></button>
+          <button class="chip" data-v="live">📡 실시간 대결 <small>QR로 다 같이</small></button>
         </div>
+      </div>
+      <div id="soloSetup" class="opt">
+        <span class="lb">내 이름</span>
+        <label class="field solo-field"><input id="soloName" maxlength="10" placeholder="이름을 써요 (안 써도 돼요)"></label>
+      </div>
+      <div id="liveSetup" class="opt tab-setup" hidden>
+        <span class="lb">선생님 설정</span>
+        <div class="tab-fields">
+          <label class="field"><span>서버 주소</span><input id="apiUrl" placeholder="https://script.google.com/macros/s/…/exec"></label>
+          <div id="apiInfo" class="tab-info">구글 앱스 스크립트 <b>웹 앱 주소</b>를 한 번만 넣어 두면 돼요. (설정 안내서 참고)</div>
+          <div class="live-btns"><button id="apiTest" class="link-btn">🔌 연결 확인</button><button id="openLive" class="go">📡 실시간 대결방 열기</button></div>
+        </div>
+      </div>
+      <div id="tabSetup" class="opt tab-setup" hidden>
+        <span class="lb">우리 모둠</span>
+        <div class="tab-fields">
+          <div id="tabAnimals" class="animals"></div>
+          <label class="field"><span>모둠 이름</span><input id="tabName" maxlength="8" placeholder="예: 1모둠"></label>
+          <label class="field"><span>문제 번호</span><input id="tabCode" maxlength="5" inputmode="numeric" placeholder="칠판의 다섯 자리"></label>
+          <div id="tabInfo" class="tab-info">칠판에 나온 <b>문제 번호</b>를 넣어요. 모든 모둠에 같은 그림이 나와요!</div>
+        </div>
+        <button id="openCollect" class="link-btn">🧑‍🏫 선생님: 문제 번호 만들기 · 점수 모으기</button>
       </div>
       <div id="teamSetup" class="opt" hidden>
         <span class="lb">모둠</span>
@@ -375,6 +492,7 @@
     </div>
 
     <button id="start" class="start">시작하기 🚀</button>
+    <p class="board-link"><button id="openBoard" class="link-btn">🏅 우리 반 순위 보기</button></p>
     <p class="credit">그림 데이터: Google <a href="https://quickdraw.withgoogle.com/data" target="_blank" rel="noopener">Quick, Draw! Dataset</a> (CC BY 4.0) · 그중 일부를 골라 이 파일 안에 넣었어요.</p>
   </section>
 
@@ -390,6 +508,106 @@
       <button id="introGo" class="go">모두 확인! 시작하기 🚀</button>
       <button id="introPrint" class="go soft">🖨 모둠 카드 인쇄</button>
       <button id="introBack" class="go soft">🏠 처음으로</button>
+    </div>
+  </section>
+
+  <!-- 실시간 대결방 (선생님 칠판): QR + 2~3초마다 바뀌는 순위 -->
+  <section id="live" hidden>
+    <div class="topbar">
+      <button id="liveHome" class="home-btn" title="처음으로">🏠</button><span class="tag">📡 실시간 대결방</span>
+      <span class="sp"></span><span id="liveCount" class="scorebox" hidden>0명</span>
+    </div>
+    <div id="liveMake" class="panel">
+      <h2 class="step-h">대결방 만들기</h2>
+      <div class="sel-row">
+        <label>주제 <select id="lTopic"></select></label>
+        <label>단계 <select id="lLevel"><option value="1">1단계</option><option value="2">2단계</option><option value="3">3단계</option></select></label>
+        <label>문제 수 <select id="lRounds"><option value="5">5문제</option><option value="10" selected>10문제</option><option value="15">15문제</option></select></label>
+      </div>
+      <button id="lMake" class="go">📡 방 만들기</button>
+    </div>
+    <div id="liveRoom" class="live-grid" hidden>
+      <div class="panel live-qr">
+        <div class="qr-say">📷 탭으로 QR을 찍어요!</div>
+        <div id="lQr" class="qr-box"></div>
+        <div class="live-code">방 번호 <b id="lCode"></b></div>
+        <div id="lSet" class="live-set"></div>
+        <button id="lCopy" class="link-btn">🔗 주소 복사</button>
+      </div>
+      <div class="panel">
+        <h2 class="step-h">실시간 순위 <span id="lUpd" class="upd"></span></h2>
+        <div id="lList" class="live-list"></div>
+        <div class="live-actions"><button id="lFinish" class="go">🏁 결과 발표</button><button id="lNew" class="go soft">🆕 새 방</button></div>
+      </div>
+    </div>
+    <div id="lResult" hidden>
+      <div class="res-hero"><h1>🏆 실시간 대결 결과</h1><p id="lSub"></p></div>
+      <div id="lPodium" class="podium"></div>
+      <div class="panel"><div id="lRankList" class="rank-list"></div></div>
+      <div class="btns"><button id="lBack" class="go soft">📡 대결방으로 돌아가기</button></div>
+    </div>
+  </section>
+
+  <!-- 학생 탭: QR로 들어오는 화면 -->
+  <section id="join" hidden>
+    <div class="hero">
+      <span class="badge">📡 실시간 대결</span>
+      <h1>대결방 <span id="jCode" class="hl"></span></h1>
+      <p id="jSet"></p>
+    </div>
+    <div class="panel join-panel">
+      <label class="field"><span>내 이름</span><input id="jName" maxlength="10" placeholder="별명이나 번호도 좋아요"></label>
+      <div id="jInfo" class="tab-info">이름을 쓰고 들어가요. 칠판에 내 점수가 실시간으로 나와요!</div>
+    </div>
+    <button id="jGo" class="start">들어가기 🚀</button>
+  </section>
+
+  <!-- 우리 반 순위 (이 기기에서 이름을 쓰고 한 혼자 하기 최고 점수) -->
+  <section id="board" hidden>
+    <div class="topbar"><button id="boardHome" class="home-btn" title="처음으로">🏠</button><span class="tag">🏅 우리 반 순위</span></div>
+    <div class="panel board-filter">
+      <div class="sel-row">
+        <label>주제 <select id="bTopic"></select></label>
+        <label>단계 <select id="bLevel"><option value="1">1단계</option><option value="2">2단계</option><option value="3">3단계</option></select></label>
+        <label>문제 수 <select id="bRounds"><option value="5">5문제</option><option value="10">10문제</option><option value="15">15문제</option></select></label>
+      </div>
+      <p class="step-p">같은 주제·단계·문제 수로 한 친구들끼리 비교해요. 이름마다 가장 높은 점수만 올라가요.</p>
+    </div>
+    <div id="bEmpty" class="board-empty" hidden>🙋 아직 기록이 없어요.<br>첫 화면에서 <b>내 이름</b>을 쓰고 게임을 해 보세요!</div>
+    <div id="bShow">
+      <div class="res-hero"><h1 id="bTitle"></h1><p id="bSub"></p></div>
+      <div id="bPodium" class="podium"></div>
+      <div class="panel"><div id="bRankList" class="rank-list"></div></div>
+    </div>
+    <div class="btns"><button id="bClear" class="go soft">🧹 이 순위 비우기</button></div>
+  </section>
+
+  <!-- 탭 대결 진행판 (선생님 칠판) -->
+  <section id="collect" hidden>
+    <div class="topbar"><button id="collectHome" class="home-btn" title="처음으로">🏠</button><span class="tag">🧑‍🏫 탭 대결 진행판</span></div>
+    <div class="collect-grid">
+      <div class="panel">
+        <h2 class="step-h">① 문제 번호 만들기</h2>
+        <div class="sel-row">
+          <label>주제 <select id="cTopic"></select></label>
+          <label>단계 <select id="cLevel"><option value="1">1단계</option><option value="2">2단계</option><option value="3">3단계</option></select></label>
+          <label>문제 수 <select id="cRounds"><option value="5">5문제</option><option value="10" selected>10문제</option><option value="15">15문제</option></select></label>
+        </div>
+        <button id="cMake" class="go">🎲 문제 번호 만들기</button>
+        <div id="cCode" class="big-code" hidden></div>
+      </div>
+      <div class="panel">
+        <h2 class="step-h">② 모둠 점수 넣기</h2>
+        <p class="step-p">탭에 나온 점수를 넣어요. 빈 칸은 순위에서 빠져요.</p>
+        <div id="cRows" class="c-rows"></div>
+        <div class="c-add-row"><button id="cAdd" class="c-add">＋ 모둠 추가</button><span id="cCount" class="c-count"></span></div>
+        <button id="cRank" class="go">🏆 순위 발표</button>
+      </div>
+    </div>
+    <div id="cResult" hidden>
+      <div class="res-hero"><h1>🏆 탭 대결 결과</h1><p id="cSub"></p></div>
+      <div id="cPodium" class="podium"></div>
+      <div class="panel"><div id="cRankList" class="rank-list"></div></div>
     </div>
   </section>
 
@@ -437,6 +655,9 @@
       <div class="panel"><div id="rankList" class="rank-list"></div></div>
       <h3 class="sub-h">어떤 그림이 나왔을까요?</h3>
     </div>
+    <div id="tabResult" hidden>
+      <div id="tabCard" class="tab-card"></div>
+    </div>
     <div id="soloHero" class="res-hero">
       <div class="medal"><div><div id="rTotal" class="big">0</div><small id="rMax">점</small></div></div>
       <h1 id="rTitle"></h1>
@@ -445,6 +666,7 @@
     <div class="panel"><div id="gallery" class="gallery"></div></div>
     <div class="btns">
       <button id="again" class="go">한 번 더 🔁</button>
+      <button id="resBoard" class="go soft" hidden>🏅 순위 보기</button>
       <button id="toHome" class="go soft">주제 다시 고르기 🏠</button>
     </div>
     <p class="credit">그림 데이터: Google Quick, Draw! Dataset (CC BY 4.0)</p>
@@ -473,8 +695,26 @@ const LEVEL = {
 const $ = (id) => document.getElementById(id);
 function load(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } }
 function save(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
-function shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
-function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+/* 탭 대결에서는 문제 번호로 정해지는 난수를 써서 모든 탭에 같은 문제가 나온다 */
+let rng = Math.random;
+function seeded(seed) {
+  return () => { seed |= 0; seed = (seed + 0x6d2b79f5) | 0; let t = Math.imul(seed ^ (seed >>> 15), 1 | seed); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+}
+function shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rng() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function pick(a) { return a[Math.floor(rng() * a.length)]; }
+
+/* 문제 번호(5자리) = 설정 조합(주제·단계·문제 수, 0~53) × 1000 + 무작위 3자리 */
+const ROUNDS = ["5", "10", "15"];
+function makeCode(topic, level, rounds) {
+  const combo = GROUPS.findIndex((g) => g.id === topic) * 9 + (+level - 1) * 3 + ROUNDS.indexOf(String(rounds));
+  return String(combo * 1000 + Math.floor(Math.random() * 1000)).padStart(5, "0");
+}
+function readCode(code) {
+  if (!/^\d{5}$/.test(code)) return null;
+  const combo = Math.floor(+code / 1000);
+  if (combo > 53) return null;
+  return { topic: GROUPS[Math.floor(combo / 9)].id, level: String(Math.floor(combo % 9 / 3) + 1), rounds: ROUNDS[combo % 3], seed: +code };
+}
 
 /* 16진수 문자열 → [[x,y],...] 획 목록 */
 function decode(pic) {
@@ -488,6 +728,10 @@ function decode(pic) {
 /* ---------- 첫 화면 ---------- */
 const opts = { topic: load("hq-topic", "all"), level: "1", rounds: "10", auto: "1", mode: "solo", teams: "4" };
 const best = load("hq-best", {});
+// 이름이 없으면 예전처럼 주제 이름만, 이름이 있으면 "이름|주제"
+function bestKey(topic, name) { return name ? `${name}|${topic}` : topic; }
+$("soloName").value = load("hq-soloname", "");
+$("soloName").addEventListener("input", () => { save("hq-soloname", $("soloName").value); renderTopics(); });
 
 /* 모둠 대결: 모둠 모양과 색 */
 const TEAMS = [
@@ -497,6 +741,13 @@ const TEAMS = [
   { ic: "🐸", nm: "개구리", bg: "#cdeedc", deep: "#4fb889" },
   { ic: "🐳", nm: "고래", bg: "#d4e9fb", deep: "#6aa8e0" },
   { ic: "🦄", nm: "유니콘", bg: "#e6ddff", deep: "#9d86ea" },
+  // 여기부터는 탭 대결에서 모둠이 더 많을 때 쓰는 동물
+  { ic: "🐼", nm: "판다", bg: "#ececf4", deep: "#8b8fb0" },
+  { ic: "🦊", nm: "여우", bg: "#ffe2c8", deep: "#f08a4b" },
+  { ic: "🐧", nm: "펭귄", bg: "#dcecf7", deep: "#4f8cc4" },
+  { ic: "🐥", nm: "병아리", bg: "#fff6c2", deep: "#e0ad16" },
+  { ic: "🐙", nm: "문어", bg: "#f6dcf3", deep: "#c873bd" },
+  { ic: "🐨", nm: "코알라", bg: "#e4e9ee", deep: "#7d8d9c" },
 ];
 const teamNames = load("hq-teamnames", TEAMS.map((t) => t.nm));
 function renderTeamSetup() {
@@ -512,7 +763,7 @@ $("teamNames").addEventListener("input", (e) => {
 function renderTopics() {
   $("topics").innerHTML = GROUPS.map((g) => {
     const cnt = g.id === "all" ? DATA.length : DATA.filter((c) => c.g === g.id).length;
-    const b = best[g.id];
+    const b = best[bestKey(g.id, $("soloName").value.trim())];
     return `<button class="topic${opts.topic === g.id ? " on" : ""}" data-t="${g.id}" style="background:${g.bg}">
       <div class="ic">${g.ic}</div><div class="nm">${g.nm}</div>
       <div class="ds">그림 ${cnt}종</div>
@@ -528,8 +779,100 @@ document.querySelectorAll("[data-opt]").forEach((box) => {
     const c = e.target.closest(".chip"); if (!c) return;
     box.querySelectorAll(".chip").forEach((x) => x.classList.toggle("on", x === c));
     opts[box.dataset.opt] = c.dataset.v;
-    if (box.dataset.opt === "mode" || box.dataset.opt === "teams") renderTeamSetup();
+    if (box.dataset.opt === "mode" || box.dataset.opt === "teams") { renderTeamSetup(); renderTabSetup(); }
   });
+});
+
+/* ---------- 탭 대결: 우리 모둠 이름·동물·문제 번호 ---------- */
+let tabAnimal = load("hq-tabanimal", 0);
+$("tabName").value = load("hq-tabname", "");
+function renderTabSetup() {
+  const on = opts.mode === "tab" || opts.mode === "live";
+  $("tabSetup").hidden = opts.mode !== "tab";
+  $("liveSetup").hidden = opts.mode !== "live";
+  $("start").hidden = opts.mode === "live"; // 실시간은 선생님이 방을 열고, 학생은 QR로 들어온다
+  $("soloSetup").hidden = opts.mode !== "solo";
+  // 주제·단계·문제 수는 문제 번호에 들어 있으니 숨기기
+  $("topics").hidden = on;
+  ["level", "rounds", "auto"].forEach((k) => (document.querySelector(`[data-opt="${k}"]`).closest(".opt").hidden = on));
+  $("tabAnimals").innerHTML = TEAMS.map((t, k) =>
+    `<button class="animal${k === tabAnimal ? " on" : ""}" data-k="${k}" style="background:${t.bg};--deep:${t.deep}" title="${t.nm}">${t.ic}</button>`).join("");
+  showCodeInfo();
+}
+$("tabAnimals").addEventListener("click", (e) => {
+  const b = e.target.closest(".animal"); if (!b) return;
+  tabAnimal = +b.dataset.k; save("hq-tabanimal", tabAnimal); renderTabSetup();
+});
+$("tabName").addEventListener("input", () => save("hq-tabname", $("tabName").value));
+$("tabCode").addEventListener("input", () => { $("tabCode").value = $("tabCode").value.replace(/\D/g, ""); showCodeInfo(); });
+function showCodeInfo() {
+  const v = $("tabCode").value.trim(), c = readCode(v), box = $("tabInfo");
+  box.className = "tab-info";
+  if (!v) { box.innerHTML = "칠판에 나온 <b>문제 번호</b>를 넣어요. 모든 모둠에 같은 그림이 나와요!"; return; }
+  if (!c) { box.classList.add("bad"); box.textContent = v.length < 5 ? "다섯 자리를 다 넣어요 ✏️" : "번호가 맞지 않아요. 칠판을 다시 봐요 👀"; return; }
+  const g = GROUPS.find((x) => x.id === c.topic);
+  box.classList.add("good");
+  box.innerHTML = `✔ ${g.ic} <b>${g.nm}</b> · ${c.level}단계 · ${c.rounds}문제`;
+}
+
+/* ---------- 탭 대결 진행판 (선생님) ---------- */
+$("cTopic").innerHTML = GROUPS.map((g) => `<option value="${g.id}">${g.ic} ${g.nm}</option>`).join("");
+/* 모둠 줄: { a: 동물 번호, nm: 이름, score } — 처음엔 4모둠, ＋로 늘리고 ✕로 빼기 */
+const collectRows = load("hq-collect2", TEAMS.slice(0, 4).map((t, k) => ({ a: k, nm: teamNames[k] || t.nm, score: "" })));
+function renderCollect() {
+  $("cRows").innerHTML = collectRows.map((r, k) => {
+    const t = TEAMS[r.a];
+    return `<div class="c-row" style="background:${t.bg}">
+      <span class="ci">${t.ic}</span>
+      <input class="cn" data-k="${k}" maxlength="8" value="${(r.nm || "").replace(/"/g, "&quot;")}" placeholder="${t.nm}">
+      <input class="cs" data-k="${k}" inputmode="numeric" maxlength="4" value="${r.score}" placeholder="점수"><span>점</span>
+      <button class="c-del" data-k="${k}" title="이 모둠 빼기">✕</button></div>`;
+  }).join("");
+  $("cAdd").disabled = collectRows.length >= TEAMS.length;
+  $("cCount").textContent = `${collectRows.length}모둠`;
+}
+$("cAdd").addEventListener("click", () => {
+  if (collectRows.length >= TEAMS.length) return;
+  const used = collectRows.map((r) => r.a);
+  const a = TEAMS.findIndex((_, k) => !used.includes(k));
+  collectRows.push({ a, nm: TEAMS[a].nm, score: "" });
+  save("hq-collect2", collectRows); renderCollect();
+  const ins = $("cRows").querySelectorAll(".cn"); ins[ins.length - 1].select();
+});
+$("cRows").addEventListener("click", (e) => {
+  const b = e.target.closest(".c-del"); if (!b) return;
+  if (collectRows.length <= 2) { $("cRows").classList.remove("nudge"); void $("cRows").offsetWidth; $("cRows").classList.add("nudge"); return; }
+  collectRows.splice(+b.dataset.k, 1);
+  save("hq-collect2", collectRows); renderCollect();
+});
+$("cRows").addEventListener("input", (e) => {
+  const k = e.target.dataset.k; if (k === undefined) return;
+  if (e.target.classList.contains("cs")) e.target.value = e.target.value.replace(/\D/g, "");
+  collectRows[+k][e.target.classList.contains("cs") ? "score" : "nm"] = e.target.value;
+  save("hq-collect2", collectRows);
+});
+$("openCollect").addEventListener("click", () => {
+  $("cTopic").value = opts.topic;
+  renderCollect(); $("cResult").hidden = true; show("collect");
+});
+$("collectHome").addEventListener("click", () => { renderTabSetup(); show("home"); });
+$("cMake").addEventListener("click", () => {
+  const code = makeCode($("cTopic").value, $("cLevel").value, $("cRounds").value);
+  const g = GROUPS.find((x) => x.id === $("cTopic").value);
+  $("cCode").innerHTML = `<small>문제 번호</small><b>${code}</b><span>${g.ic} ${g.nm} · ${$("cLevel").value}단계 · ${$("cRounds").value}문제</span>`;
+  $("cCode").hidden = false;
+  // 새 판이니 지난 점수 비우기
+  collectRows.forEach((r) => (r.score = "")); save("hq-collect2", collectRows); renderCollect();
+});
+$("cRank").addEventListener("click", () => {
+  const list = collectRows.map((r) => ({ ...TEAMS[r.a], nm: r.nm.trim() || TEAMS[r.a].nm, score: +r.score, has: r.score !== "" }))
+    .filter((t) => t.has);
+  if (list.length < 2) { $("cRows").classList.remove("nudge"); void $("cRows").offsetWidth; $("cRows").classList.add("nudge"); return; }
+  const ranked = renderRanking(list, "cPodium", "cRankList");
+  $("cSub").textContent = winnerText(ranked);
+  $("cResult").hidden = false;
+  $("cResult").scrollIntoView({ behavior: "smooth" });
+  confetti();
 });
 
 /* ---------- 게임 상태 ---------- */
@@ -538,20 +881,278 @@ let Q = null;          // 지금 문제
 let anim = 0;          // requestAnimationFrame 번호
 let autoTimer = 0, nextTimer = 0;
 
-function show(id) { ["home", "intro", "game", "result"].forEach((s) => ($(s).hidden = s !== id)); window.scrollTo(0, 0); }
+/* ---------- 우리 반 순위: { "주제|단계|문제 수": { 이름: { score, right, n } } } ---------- */
+const board = load("hq-board", {});
+const boardKey = (topic, level, rounds) => `${topic}|${level}|${rounds}`;
+function boardList(key) {
+  return Object.entries(board[key] || {}).map(([nm, r]) => ({ nm, ...r })).sort((a, b) => b.score - a.score);
+}
+// 이름마다 최고 점수만 남기고, 지금 몇 등인지 돌려준다
+function recordBoard(topic, level, rounds, name, score, right, n) {
+  const key = boardKey(topic, level, rounds), rows = (board[key] = board[key] || {});
+  if (!rows[name] || score > rows[name].score) rows[name] = { score, right, n };
+  save("hq-board", board);
+  const mine = rows[name].score;
+  return 1 + Object.values(rows).filter((r) => r.score > mine).length;
+}
+// 처음 나온 이름부터 차례로 동물을 정해 두고, 다음에도 같은 동물·색을 쓴다
+const avatars = load("hq-avatars", {});
+function avatar(name) {
+  if (avatars[name] === undefined) { avatars[name] = Object.keys(avatars).length % TEAMS.length; save("hq-avatars", avatars); }
+  return TEAMS[avatars[name]];
+}
+$("bTopic").innerHTML = GROUPS.map((g) => `<option value="${g.id}">${g.ic} ${g.nm}</option>`).join("");
+let boardMe = "";
+function openBoard(topic, level, rounds, me) {
+  $("bTopic").value = topic; $("bLevel").value = String(level); $("bRounds").value = String(rounds);
+  boardMe = me || "";
+  renderBoard(); show("board");
+}
+function renderBoard() {
+  const key = boardKey($("bTopic").value, $("bLevel").value, $("bRounds").value);
+  const list = boardList(key).map((r) => ({ ...avatar(r.nm), nm: r.nm, score: r.score, right: r.right }));
+  $("bEmpty").hidden = list.length > 0;
+  $("bShow").hidden = list.length === 0;
+  $("bClear").hidden = list.length === 0;
+  if (!list.length) return;
+  const g = GROUPS.find((x) => x.id === $("bTopic").value);
+  $("bTitle").textContent = `${g.ic} ${g.nm} · ${$("bLevel").value}단계 · ${$("bRounds").value}문제`;
+  const ranked = renderRanking(list, "bPodium", "bRankList");
+  const firsts = ranked.filter((t) => t.rank === 1);
+  $("bSub").textContent = `${list.length}명 도전 · 1등은 ${firsts.map((t) => t.nm).join(", ")} 🎉`;
+  // 방금 한 친구 줄은 눈에 띄게
+  [...$("bRankList").children].forEach((row, i) => {
+    if (ranked[i].nm === boardMe) { row.classList.add("me"); row.querySelector(".rn").insertAdjacentHTML("beforeend", "<small>⬅ 나</small>"); }
+  });
+}
+["bTopic", "bLevel", "bRounds"].forEach((id) => $(id).addEventListener("change", () => { boardMe = ""; renderBoard(); }));
+$("bClear").addEventListener("click", () => {
+  const g = GROUPS.find((x) => x.id === $("bTopic").value);
+  if (!confirm(`${g.nm} · ${$("bLevel").value}단계 · ${$("bRounds").value}문제 순위를 모두 지울까요?`)) return;
+  delete board[boardKey($("bTopic").value, $("bLevel").value, $("bRounds").value)];
+  save("hq-board", board); renderBoard();
+});
+$("openBoard").addEventListener("click", () => openBoard(opts.mode === "solo" ? opts.topic : "all", opts.level, opts.rounds));
+$("resBoard").addEventListener("click", () => openBoard(G.topic, G.level, G.rounds, G.player));
+$("boardHome").addEventListener("click", () => { renderTopics(); show("home"); });
+
+/* ---------- 실시간 대결: 구글 앱스 스크립트 웹 앱에 점수를 모은다 ---------- */
+// 주소는 QR 안에 들어가므로 파일에는 넣지 않는다. script.google.com 주소면 짧게 아이디만 쓴다.
+function apiFull(a) { return /^https?:/.test(a) ? a : `https://script.google.com/macros/s/${a}/exec`; }
+function apiShort(url) { const m = url.match(/script\.google\.com\/macros\/s\/([\w-]+)\/exec/); return m ? m[1] : url; }
+const devId = load("hq-dev", "") || (() => { const d = Math.random().toString(36).slice(2, 10); save("hq-dev", d); return d; })();
+let LIVE = null;          // 학생 탭: { room, api, name }
+let livePending = null, liveBusy = false, liveRetry = 0, liveSentOk = false;
+async function apiGet(api, room) {
+  const r = await fetch(`${apiFull(api)}?action=board&room=${room}&t=${Date.now()}`);
+  return r.json();
+}
+async function apiPost(api, body) {
+  // text/plain 으로 보내면 구글 서버가 따로 묻지 않고 받는다
+  const r = await fetch(apiFull(api), { method: "POST", body: JSON.stringify(body) });
+  return r.json();
+}
+// 가장 최근 점수만 보내고, 실패하면 3초 뒤 다시 보낸다 (와이파이가 잠깐 끊겨도 괜찮게)
+function liveSend(p) { livePending = { action: "score", room: LIVE.room, name: LIVE.name, dev: devId, ...p }; liveSentOk = false; liveFlush(); }
+async function liveFlush() {
+  if (liveBusy || !livePending) return;
+  liveBusy = true;
+  const body = livePending;
+  try {
+    const res = await apiPost(LIVE.api, body);
+    if (!res.ok) throw new Error(res.error);
+    if (livePending === body) { livePending = null; liveSentOk = true; }
+  } catch (e) {
+    clearTimeout(liveRetry); liveRetry = setTimeout(liveFlush, 3000);
+  }
+  liveBusy = false;
+  if (livePending && livePending !== body) liveFlush();
+}
+// 끝난 뒤: 점수가 다 올라가면 지금 몇 등인지 보여 주기
+async function liveMyRank() {
+  for (let k = 0; k < 40 && !liveSentOk; k++) await new Promise((r) => setTimeout(r, 500));
+  const box = $("liveMine"); if (!box) return;
+  try {
+    const res = await apiGet(LIVE.api, LIVE.room);
+    const list = Object.entries(res.players || {}).map(([nm, p]) => ({ nm, ...p }));
+    const me = list.find((p) => p.nm === LIVE.name);
+    const rank = 1 + list.filter((p) => p.score > (me ? me.score : G.score)).length;
+    box.textContent = `✔ 칠판에 올라갔어요 · 지금 ${list.length}명 중 ${rank}등!`;
+  } catch (e) {
+    box.textContent = liveSentOk ? "✔ 칠판에 점수가 올라갔어요!" : "⏳ 인터넷이 연결되면 점수가 저절로 올라가요.";
+  }
+}
+
+/* 학생 탭: QR 주소(?live=방번호&api=…)로 열렸을 때 */
+function openJoin(room, api) {
+  const c = readCode(room);
+  if (!c || !api) return false;
+  LIVE = { room, api, name: "" };
+  const g = GROUPS.find((x) => x.id === c.topic);
+  $("jCode").textContent = room;
+  $("jSet").textContent = `${g.ic} ${g.nm} · ${c.level}단계 · ${c.rounds}문제 · 모두 같은 그림이 나와요!`;
+  $("jName").value = load("hq-livename", "");
+  show("join");
+  return true;
+}
+$("jName").addEventListener("input", () => save("hq-livename", $("jName").value));
+$("jGo").addEventListener("click", async () => {
+  const name = $("jName").value.trim(), info = $("jInfo");
+  if (!name) { info.className = "tab-info bad"; info.textContent = "이름을 먼저 써요 ✏️"; $("jName").focus(); return; }
+  info.className = "tab-info"; info.textContent = "⏳ 대결방에 들어가는 중…";
+  $("jGo").disabled = true;
+  try {
+    const res = await apiPost(LIVE.api, { action: "join", room: LIVE.room, name, dev: devId, total: +readCode(LIVE.room).rounds });
+    if (!res.ok && res.error === "name") { info.className = "tab-info bad"; info.textContent = `"${name}"은(는) 벌써 다른 탭에 있어요. 다른 이름(예: ${name}2)을 써 주세요.`; return; }
+    if (!res.ok) throw new Error(res.error);
+    if (res.done) { info.className = "tab-info good"; info.textContent = `벌써 끝냈어요! 내 점수는 ${res.score}점이에요. 칠판을 봐요 📺`; return; }
+    LIVE.name = name;
+    opts.mode = "live";
+    startGame();
+  } catch (e) {
+    info.className = "tab-info bad"; info.textContent = "서버에 연결하지 못했어요. 인터넷을 확인하고 다시 눌러 주세요 📶";
+  } finally { $("jGo").disabled = false; }
+});
+
+/* 선생님: 서버 주소 저장·연결 확인 */
+$("apiUrl").value = load("hq-api", "");
+$("apiUrl").addEventListener("input", () => save("hq-api", $("apiUrl").value.trim()));
+$("apiTest").addEventListener("click", async () => {
+  const a = $("apiUrl").value.trim(), box = $("apiInfo");
+  if (!a) { box.className = "tab-info bad"; box.textContent = "서버 주소를 먼저 넣어요."; return; }
+  box.className = "tab-info"; box.textContent = "⏳ 연결해 보는 중…";
+  try {
+    const r = await fetch(apiFull(a) + "?t=" + Date.now()).then((x) => x.json());
+    if (!r.ok) throw 0;
+    box.className = "tab-info good"; box.textContent = "✔ 연결됐어요! 이제 대결방을 열 수 있어요.";
+  } catch (e) {
+    box.className = "tab-info bad"; box.textContent = "연결이 안 돼요. 주소가 …/exec 로 끝나는지, 배포할 때 '모든 사용자'를 골랐는지 확인해요.";
+  }
+});
+
+/* 선생님 칠판: 대결방 */
+let liveRoom = "", livePoll = 0, liveBusyGet = false, livePlayers = {};
+$("lTopic").innerHTML = GROUPS.map((g) => `<option value="${g.id}">${g.ic} ${g.nm}</option>`).join("");
+$("openLive").addEventListener("click", () => {
+  if (!$("apiUrl").value.trim()) { $("apiInfo").className = "tab-info bad"; $("apiInfo").textContent = "서버 주소를 먼저 넣어요."; return; }
+  $("lTopic").value = opts.topic;
+  showLiveMake();
+  show("live");
+});
+function showLiveMake() {
+  clearInterval(livePoll); liveRoom = "";
+  $("liveMake").hidden = false; $("liveRoom").hidden = true; $("lResult").hidden = true; $("liveCount").hidden = true;
+}
+function joinUrl(room) {
+  return `${location.origin}${location.pathname}?live=${room}&api=${encodeURIComponent(apiShort($("apiUrl").value.trim()))}`;
+}
+function loadQrLib() {
+  if (window.qrcode) return Promise.resolve();
+  return new Promise((ok, no) => {
+    const s = document.createElement("script");
+    s.src = "https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js";
+    s.onload = ok; s.onerror = no; document.head.appendChild(s);
+  });
+}
+$("lMake").addEventListener("click", async () => {
+  liveRoom = makeCode($("lTopic").value, $("lLevel").value, $("lRounds").value);
+  const g = GROUPS.find((x) => x.id === $("lTopic").value), url = joinUrl(liveRoom);
+  $("lCode").textContent = liveRoom;
+  $("lSet").textContent = `${g.ic} ${g.nm} · ${$("lLevel").value}단계 · ${$("lRounds").value}문제`;
+  $("liveMake").hidden = true; $("liveRoom").hidden = false; $("lResult").hidden = true; $("liveCount").hidden = false;
+  $("lQr").innerHTML = "⏳";
+  try {
+    await loadQrLib();
+    const qr = qrcode(0, "M"); qr.addData(url); qr.make();
+    $("lQr").innerHTML = qr.createSvgTag({ cellSize: 6, margin: 2, scalable: true });
+  } catch (e) {
+    $("lQr").innerHTML = `<div class="qr-fail">QR을 만들지 못했어요 (인터넷 확인). 아래 🔗 주소 복사로 링크를 보내 주세요.</div>`;
+  }
+  livePlayers = {};
+  renderLive();
+  clearInterval(livePoll); livePoll = setInterval(pollLive, 2500); pollLive();
+});
+$("lCopy").addEventListener("click", async () => {
+  try { await navigator.clipboard.writeText(joinUrl(liveRoom)); $("lCopy").textContent = "✔ 복사했어요"; }
+  catch (e) { prompt("이 주소를 복사해 보내 주세요", joinUrl(liveRoom)); }
+  setTimeout(() => ($("lCopy").textContent = "🔗 주소 복사"), 2000);
+});
+async function pollLive() {
+  if (!liveRoom || liveBusyGet) return;
+  liveBusyGet = true;
+  try {
+    const res = await apiGet($("apiUrl").value.trim(), liveRoom);
+    if (!res.ok) throw 0;
+    const before = livePlayers; livePlayers = res.players || {};
+    renderLive(before);
+    $("lUpd").className = "upd"; $("lUpd").textContent = "· 방금 업데이트";
+  } catch (e) {
+    $("lUpd").className = "upd off"; $("lUpd").textContent = "· 연결이 잠깐 끊겼어요, 다시 시도 중";
+  }
+  liveBusyGet = false;
+}
+function renderLive(before = {}) {
+  const list = Object.entries(livePlayers).map(([nm, p]) => ({ ...avatar(nm), nm, ...p })).sort((a, b) => b.score - a.score || b.step - a.step);
+  list.forEach((p) => (p.rank = 1 + list.filter((o) => o.score > p.score).length));
+  $("liveCount").textContent = `👥 ${list.length}명 · 끝 ${list.filter((p) => p.done).length}명`;
+  if (!list.length) { $("lList").innerHTML = `<div class="live-empty">아직 아무도 안 들어왔어요.<br>QR을 찍고 이름을 쓰면 여기에 나와요! 📷</div>`; return; }
+  const medal = { 1: "🥇", 2: "🥈", 3: "🥉" };
+  $("lList").innerHTML = list.map((p) => {
+    const changed = !before[p.nm] || before[p.nm].score !== p.score;
+    return `<div class="lrow${changed ? " up" : ""}" style="background:${p.bg}">
+      <span class="lk">${medal[p.rank] || p.rank}</span><span class="li">${p.ic}</span>
+      <span class="ln">${p.nm.replace(/</g, "&lt;")}${p.done ? " ✔" : ""}</span>
+      <span><div class="lp"><i style="width:${Math.round(100 * p.step / (p.total || 1))}%;background:${p.deep}"></i></div><div class="lpt">${p.done ? "끝!" : `${p.step} / ${p.total}문제`}</div></span>
+      <span class="ls">${p.score}점</span></div>`;
+  }).join("");
+}
+$("lFinish").addEventListener("click", () => {
+  const list = Object.entries(livePlayers).map(([nm, p]) => ({ ...avatar(nm), nm: nm.replace(/</g, "&lt;"), score: p.score, right: p.right }));
+  if (list.length < 1) return;
+  const ranked = renderRanking(list, "lPodium", "lRankList");
+  const firsts = ranked.filter((t) => t.rank === 1);
+  $("lSub").textContent = `${list.length}명 도전 · 1등은 ${firsts.map((t) => t.nm).join(", ")} 🎉`;
+  $("liveRoom").hidden = true; $("lResult").hidden = false;
+  window.scrollTo(0, 0); confetti();
+});
+$("lBack").addEventListener("click", () => { $("lResult").hidden = true; $("liveRoom").hidden = false; });
+$("lNew").addEventListener("click", () => { if (confirm("새 방을 만들까요? 지금 방의 순위는 화면에서 사라져요.")) showLiveMake(); });
+$("liveHome").addEventListener("click", () => { clearInterval(livePoll); liveRoom = ""; renderTabSetup(); show("home"); });
+
+function show(id) { ["home", "live", "join", "board", "collect", "intro", "game", "result"].forEach((s) => ($(s).hidden = s !== id)); window.scrollTo(0, 0); }
 
 function startGame(skipIntro) {
-  const pool = opts.topic === "all" ? DATA : DATA.filter((c) => c.g === opts.topic);
-  const rounds = Math.min(+opts.rounds, pool.length);
+  let set = opts, tab = null;
+  if (opts.mode === "tab") {
+    const c = readCode($("tabCode").value.trim());
+    const name = $("tabName").value.trim();
+    if (!c || !name) { $("tabSetup").classList.remove("nudge"); void $("tabSetup").offsetWidth; $("tabSetup").classList.add("nudge"); return; }
+    set = { ...opts, ...c, auto: "1" };
+    tab = { ...TEAMS[tabAnimal], nm: name, code: $("tabCode").value.trim() };
+    rng = seeded(c.seed);
+  }
+  if (opts.mode === "live") {
+    const c = readCode(LIVE.room);
+    set = { ...opts, ...c, auto: "1" };
+    tab = { ...avatar(LIVE.name), nm: LIVE.name, code: LIVE.room, live: true };
+    rng = seeded(c.seed);
+  }
+  const pool = set.topic === "all" ? DATA : DATA.filter((c) => c.g === set.topic);
+  const rounds = Math.min(+set.rounds, pool.length);
   G = {
-    topic: opts.topic, level: +opts.level, auto: opts.auto === "1",
+    topic: set.topic, level: +set.level, auto: set.auto === "1",
     cats: shuffle(pool).slice(0, rounds), i: 0, score: 0, log: [],
-    team: opts.mode === "team",
+    team: opts.mode === "team", tab,
+    player: opts.mode === "solo" ? $("soloName").value.trim() : "", rounds: set.rounds,
     teams: opts.mode === "team" ? TEAMS.slice(0, +opts.teams).map((t, k) => ({ ...t, nm: (teamNames[k] || "").trim() || t.nm, score: 0, right: 0 })) : [],
   };
+  // 그림과 보기를 미리 정해 두기 (탭 대결이면 모든 탭이 똑같다)
+  G.qs = G.cats.map((cat) => ({ pic: pick(cat.p), choices: makeChoices(cat) }));
+  rng = Math.random;
   const g = GROUPS.find((x) => x.id === G.topic);
-  $("gTag").textContent = `${g.ic} ${g.nm} · ${G.level}단계`;
-  $("gTag").style.background = g.bg;
+  $("gTag").textContent = tab ? `${tab.ic} ${tab.nm} · ${g.ic} ${g.nm} · ${G.level}단계`
+    : (G.player ? `🙋 ${G.player} · ` : "") + `${g.ic} ${g.nm} · ${G.level}단계`;
+  $("gTag").style.background = tab ? tab.bg : g.bg;
   setAuto(G.auto);
   $("gScore").textContent = "0점";
   document.body.classList.toggle("team", G.team);
@@ -621,8 +1222,8 @@ function nextQuestion() {
   clearTimers();
   if (G.i >= G.cats.length) return finish();
   const cat = G.cats[G.i];
-  const strokes = decode(pick(cat.p));
-  Q = { cat, strokes, shown: 0, prog: 0, drawing: false, done: false, hint: false, choices: makeChoices(cat), buzz: -1, out: [] };
+  const strokes = decode(G.qs[G.i].pic);
+  Q = { cat, strokes, shown: 0, prog: 0, drawing: false, done: false, hint: false, choices: G.qs[G.i].choices, buzz: -1, out: [] };
   renderDots();
   $("feedback").hidden = true;
   $("buzzMsg").hidden = true;
@@ -854,6 +1455,7 @@ function answer(c, btn, team = -1) {
   G.score += pts;
   G.log[G.i] = { cat: Q.cat, strokes: Q.strokes, ok, pts, stars, k, n: Q.strokes.length, hint: Q.hint, skip: !btn, team };
   $("gScore").textContent = G.score + "점";
+  if (G.tab && G.tab.live) liveSend({ score: G.score, right: G.log.filter((r) => r && r.ok).length, step: G.i + 1, done: G.i + 1 >= G.cats.length });
   renderDots();
   updateInfo();
   renderTeams(ok ? team : -1, pts);
@@ -905,7 +1507,12 @@ $("hintBtn").addEventListener("click", () => {
 });
 $("skipBtn").addEventListener("click", () => { if (!Q.done) answer(null, null); });
 
-$("quit").addEventListener("click", () => { clearTimers(); G = null; Q = null; renderTopics(); document.body.classList.remove("team"); show("home"); });
+$("quit").addEventListener("click", () => {
+  if (G && G.tab && G.tab.live) {
+    if (!confirm("대결을 그만둘까요? 지금까지 점수만 칠판에 남아요.")) return;
+    clearTimers(); G = null; Q = null; return show("join");
+  }
+  clearTimers(); G = null; Q = null; renderTopics(); document.body.classList.remove("team"); show("home"); });
 $("start").addEventListener("click", () => startGame());
 window.addEventListener("resize", () => { if (!$("game").hidden) sizeCanvas(); });
 
@@ -916,12 +1523,35 @@ function finish() {
   $("rTotal").textContent = G.score;
   $("rMax").textContent = `점 / ${max}`;
   const ratio = G.score / max;
-  $("rTitle").textContent = ratio >= 0.8 ? "그림 박사 등장! 🏆" : ratio >= 0.6 ? "멋진 눈썰미! 🌟" : ratio >= 0.4 ? "잘했어요! 👍" : "다음엔 더 잘할 수 있어요! 💪";
+  $("rTitle").textContent = (G.player ? `${G.player}, ` : "") + (ratio >= 0.8 ? "그림 박사 등장! 🏆" : ratio >= 0.6 ? "멋진 눈썰미! 🌟" : ratio >= 0.4 ? "잘했어요! 👍" : "다음엔 더 잘할 수 있어요! 💪");
   $("rSub").textContent = `${n}문제 중 ${right}문제 정답`;
-  if (!G.team && (!best[G.topic] || G.score > best[G.topic])) { best[G.topic] = G.score; save("hq-best", best); }
+  // 최고 점수는 이름마다 따로 (한 기기를 여러 학생이 같이 써도 섞이지 않게)
+  const bk = bestKey(G.topic, G.player);
+  if (!G.team && !G.tab) {
+    if (best[bk] && G.score > best[bk]) $("rSub").textContent += ` · 🎉 최고 점수 새 기록! (전에는 ${best[bk]}점)`;
+    if (!best[bk] || G.score > best[bk]) { best[bk] = G.score; save("hq-best", best); }
+  }
+  $("resBoard").hidden = !(G.player && !G.team && !G.tab);
+  if (G.player && !G.team && !G.tab) {
+    const rank = recordBoard(G.topic, G.level, G.rounds, G.player, G.score, right, n);
+    $("rSub").textContent += ` · 🏅 우리 반 ${rank}등!`;
+  }
   $("teamResult").hidden = !G.team;
-  $("soloHero").hidden = G.team;
-  if (G.team) renderRanking(n);
+  $("tabResult").hidden = !G.tab;
+  $("soloHero").hidden = G.team || !!G.tab;
+  $("again").hidden = !!G.tab;
+  if (G.team) $("trSub").textContent = `${n}문제 대결 끝! ` + winnerText(renderRanking(G.teams, "podium", "rankList"));
+  if (G.tab) {
+    const t = G.tab, g = GROUPS.find((x) => x.id === G.topic);
+    $("tabCard").style.background = t.bg;
+    $("tabCard").innerHTML = `<div class="tc-ic">${t.ic}</div><div class="tc-nm">${t.nm}</div>
+      <div class="tc-code">${t.live ? "대결방" : "문제 번호"} <b>${t.code}</b> · ${g.ic} ${g.nm} · ${G.level}단계</div>
+      <div class="tc-score" style="color:${t.deep}">${G.score}<small>점</small></div>
+      <div class="tc-sub">${n}문제 중 ${right}문제 정답${G.log.some((r) => r.hint) ? ` · 💡 ${G.log.filter((r) => r.hint).length}번` : ""}</div>
+      ${t.live ? `<div id="liveMine" class="tc-sub">⏳ 점수를 칠판에 보내는 중…</div><div class="tc-say">📺 칠판에서 순위를 확인해요!</div>`
+        : `<div class="tc-say">🙋 선생님께 이 화면을 보여 주세요!</div>`}`;
+    if (t.live) liveMyRank();
+  }
   const gal = $("gallery");
   gal.innerHTML = G.log.map((r, k) => {
     const t = r.team >= 0 ? G.teams[r.team] : null;
@@ -941,22 +1571,24 @@ function finish() {
   if (G.team || ratio >= 0.6) confetti();
 }
 /* 순위: 점수가 같으면 같은 등수 */
-function renderRanking(n) {
-  const list = G.teams.slice().sort((a, b) => b.score - a.score);
+function winnerText(list) {
+  const firsts = list.filter((t) => t.rank === 1);
+  return firsts.length > 1 ? `${firsts.map((t) => t.nm).join(", ")} 모둠이 공동 1등이에요 🎉` : `${firsts[0].ic} ${firsts[0].nm} 모둠이 1등이에요 🎉`;
+}
+function renderRanking(teams, podiumId, rankId) {
+  const list = teams.slice().sort((a, b) => b.score - a.score);
   list.forEach((t) => (t.rank = 1 + list.filter((o) => o.score > t.score).length));
-  const top = list[0];
-  const tie = list.filter((t) => t.rank === 1).length > 1;
-  $("trSub").textContent = `${n}문제 대결 끝! ` + (tie ? `${list.filter((t) => t.rank === 1).map((t) => t.nm).join(", ")} 모둠이 공동 1등이에요 🎉` : `${top.ic} ${top.nm} 모둠이 1등이에요 🎉`);
   const medal = { 1: "🥇", 2: "🥈", 3: "🥉" };
   const H = { 1: 170, 2: 120, 3: 86 };
   const pod = list.slice(0, 3);
   const order = pod.length === 3 ? [pod[1], pod[0], pod[2]] : pod.length === 2 ? [pod[1], pod[0]] : pod;
-  $("podium").innerHTML = order.map((t, i) => `<div class="pod" style="animation-delay:${i * 0.15}s">
+  $(podiumId).innerHTML = order.map((t, i) => `<div class="pod" style="animation-delay:${i * 0.15}s">
       <div class="pi">${t.ic}</div><div class="pn">${t.nm}</div><div class="ps">${t.score}점</div>
       <div class="block" style="height:${H[Math.min(t.rank, 3)]}px;background:${t.deep}">${medal[t.rank] || t.rank}</div></div>`).join("");
-  $("rankList").innerHTML = list.map((t) => `<div class="rank" style="background:${t.bg}">
+  $(rankId).innerHTML = list.map((t) => `<div class="rank" style="background:${t.bg}">
       <span class="rk">${medal[t.rank] || t.rank + "등"}</span><span class="ri">${t.ic}</span>
-      <span class="rn">${t.nm}<small>${t.right}문제 정답</small></span><span class="rs">${t.score}점</span></div>`).join("");
+      <span class="rn">${t.nm}${t.right === undefined ? "" : `<small>${t.right}문제 정답</small>`}</span><span class="rs">${t.score}점</span></div>`).join("");
+  return list;
 }
 function confetti() {
   const em = ["🎉", "⭐", "🌸", "✏️", "🎈"];
@@ -971,10 +1603,17 @@ function confetti() {
   }
 }
 $("again").addEventListener("click", () => { opts.topic = G.topic; startGame(true); });
-$("toHome").addEventListener("click", () => { renderTopics(); document.body.classList.remove("team"); show("home"); });
+$("toHome").addEventListener("click", () => {
+  if (G && G.tab && G.tab.live) return show("join"); renderTopics(); document.body.classList.remove("team"); show("home"); });
 
 renderTopics();
 renderTeamSetup();
+renderTabSetup();
+// QR로 열렸으면 바로 대결방 입장 화면으로
+{
+  const P = new URLSearchParams(location.search);
+  if (P.get("live")) openJoin(P.get("live"), P.get("api"));
+}
 </script>
 </body>
 </html>
