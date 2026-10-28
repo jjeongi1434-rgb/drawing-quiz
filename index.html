@@ -123,6 +123,7 @@
   .tool:active { transform: translateY(3px); box-shadow: 0 1px 0 rgba(0,0,0,.08); }
   .tool.next { background: var(--lavender); }
   .tool.hint { background: var(--butter); color: #8a6d22; }
+  .hint-left { display: inline-block; font-size: 0.78em; background: #fff8dc; border-radius: 999px; padding: 1px 8px; margin-left: 2px; white-space: nowrap; }
   .tool:disabled { opacity: .45; cursor: default; transform: none; }
   .autosw { display: flex; align-items: center; gap: 8px; margin: 12px 4px 0; font-size: 15px; color: var(--ink-soft); cursor: pointer; user-select: none; }
   .autosw .sw { width: 46px; height: 26px; border-radius: 99px; background: #e9ddd0; position: relative; transition: background .15s; flex: none; }
@@ -1246,6 +1247,7 @@ function startGame(skipIntro) {
     cats: shuffle(pool).slice(0, rounds), i: 0, score: 0, log: [],
     team: opts.mode === "team", tab,
     player: opts.mode === "solo" ? $("soloName").value.trim() : "", rounds: set.rounds,
+    hints: Math.ceil(rounds / 3), // 힌트는 한 판에 5문제 2개 · 10문제 4개 · 15문제 5개
     teams: opts.mode === "team" ? TEAMS.slice(0, +opts.teams).map((t, k) => ({ ...t, nm: (teamNames[k] || "").trim() || t.nm, score: 0, right: 0 })) : [],
   };
   // 그림과 보기를 미리 정해 두기 (탭 대결이면 모든 탭이 똑같다)
@@ -1335,7 +1337,7 @@ function nextQuestion() {
   renderTeams();
   box.innerHTML = Q.choices.map((c, k) => `<button class="choice" data-k="${k}">${c.ko}</button>`).join("");
   $("pen").innerHTML = strokes.map(() => "<i></i>").join("");
-  $("hintBtn").disabled = false;
+  showHints();
   $("skipBtn").disabled = false;
   fit();
   paint();
@@ -1597,9 +1599,16 @@ function goNext() {
   nextQuestion();
 }
 
+// 힌트 버튼에 남은 개수 보여 주기
+function showHints() {
+  $("hintBtn").innerHTML = `💡 힌트 <span class="hint-left">${G.hints > 0 ? `남은 ${G.hints}개` : "다 썼어요"}</span>`;
+  $("hintBtn").disabled = G.hints <= 0;
+}
 $("hintBtn").addEventListener("click", () => {
-  if (Q.done || Q.hint) return;
+  if (Q.done || Q.hint || G.hints <= 0) return;
   Q.hint = true;
+  G.hints--;
+  showHints();
   $("hintBtn").disabled = true;
   // 틀린 보기를 지워 2개만 남기기
   const wrong = shuffle([...$("choices").querySelectorAll(".choice")].filter((x) => Q.choices[+x.dataset.k] !== Q.cat));
