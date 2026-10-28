@@ -87,6 +87,13 @@
     background: var(--peach-deep); color: #fff; box-shadow: 0 7px 0 #e88c63; transition: transform .1s, box-shadow .1s;
   }
   .start:active { transform: translateY(5px); box-shadow: 0 2px 0 #e88c63; }
+  .start-row { display: flex; align-items: center; justify-content: center; gap: 18px; margin: 24px auto 10px; }
+  .start-row .start { margin: 0; flex: 0 1 420px; }
+  .qr-mini { flex: none; background: #fff; border: 3px solid var(--line); border-radius: 18px; padding: 6px 6px 4px; box-shadow: var(--shadow); cursor: zoom-in; }
+  .qr-mini[hidden] { display: none; }
+  .qr-mini-box { display: grid; place-items: center; width: 104px; height: 104px; font-size: 12px; color: var(--ink-soft); line-height: 1.3; }
+  .qr-mini-box svg { width: 104px; height: 104px; display: block; }
+  .qr-mini-say { display: block; font-family: "Jua"; font-size: 13.5px; margin-top: 2px; white-space: nowrap; }
 
   /* ---------- 게임 화면 ---------- */
   .topbar { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
@@ -280,7 +287,15 @@
   .live-actions .go { flex: 1; }
   .join-panel { max-width: 560px; margin: 0 auto; display: grid; gap: 10px; }
 
-  .board-link { text-align: center; margin: 0 0 6px; }
+  .board-link { text-align: center; margin: 0 0 6px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  @media (max-width: 560px) { .qr-mini { display: none; } }
+  .qr-pop { position: fixed; inset: 0; z-index: 50; background: rgba(90, 70, 54, .45); display: grid; place-items: center; padding: 16px; }
+  .qr-pop[hidden] { display: none; }
+  .qr-card { background: var(--card); border-radius: 30px; padding: 24px 22px 20px; text-align: center; box-shadow: var(--shadow); max-width: 440px; width: 100%; animation: pop .35s ease-out; }
+  .qr-card h2 { font-family: "Jua"; font-weight: normal; font-size: 30px; margin: 0 0 4px; }
+  .qr-card p { margin: 0 0 14px; color: var(--ink-soft); font-size: 16px; }
+  .qr-card .qr-box svg { width: min(320px, 72vw); }
+  .qr-url { font-size: 13px; color: var(--ink-soft); word-break: break-all; margin: 10px 0 14px; }
   .board-link .link-btn { font-family: "Jua"; font-size: 18px; padding: 9px 20px; background: var(--butter); border-color: #e9c95c; }
   .board-filter { margin-bottom: 8px; }
   .board-filter .sel-row { margin-bottom: 6px; }
@@ -496,10 +511,24 @@
       </div>
     </div>
 
-    <button id="start" class="start">시작하기 🚀</button>
+    <div class="start-row">
+      <button id="start" class="start">시작하기 🚀</button>
+      <button id="qrMini" class="qr-mini" title="크게 보기"><span id="qrMiniBox" class="qr-mini-box"></span><span class="qr-mini-say">📷 찍으면 열려요</span></button>
+    </div>
     <p class="board-link"><button id="openBoard" class="link-btn">🏅 우리 반 순위 보기</button></p>
     <p class="credit">그림 데이터: Google <a href="https://quickdraw.withgoogle.com/data" target="_blank" rel="noopener">Quick, Draw! Dataset</a> (CC BY 4.0) · 그중 일부를 골라 이 파일 안에 넣었어요.</p>
   </section>
+
+  <!-- 첫 화면 QR: 학생들이 탭으로 찍어 퀴즈를 연다 -->
+  <div id="qrPop" class="qr-pop" hidden>
+    <div class="qr-card">
+      <h2>📷 QR을 찍어요!</h2>
+      <p>탭이나 휴대폰 카메라로 찍으면 <b>한 획 그림 퀴즈</b>가 열려요.</p>
+      <div id="homeQr" class="qr-box"></div>
+      <div id="qrUrl" class="qr-url"></div>
+      <button id="qrClose" class="go soft">닫기</button>
+    </div>
+  </div>
 
   <!-- 모둠 소개 화면 -->
   <section id="intro" hidden>
@@ -824,7 +853,7 @@ function renderTabSetup() {
   const on = opts.mode === "tab" || opts.mode === "live";
   $("tabSetup").hidden = opts.mode !== "tab";
   $("liveSetup").hidden = opts.mode !== "live";
-  $("start").hidden = opts.mode === "live"; // 실시간은 선생님이 방을 열고, 학생은 QR로 들어온다
+  $("start").hidden = $("qrMini").hidden = opts.mode === "live"; // 실시간은 선생님이 방을 열고, 학생은 QR로 들어온다
   $("soloSetup").hidden = opts.mode !== "solo";
   // 주제·단계·문제 수는 문제 번호에 들어 있으니 숨기기
   $("topics").hidden = on;
@@ -1255,6 +1284,31 @@ $("hRoom").addEventListener("change", () => { hallRoom = $("hRoom").value; rende
 $("openHall").addEventListener("click", () => openHall(opts.topic, "*", opts.rounds, "week"));
 $("lHall").addEventListener("click", () => { const c = readCode(liveRoom); openHall(c.topic, c.level, c.rounds, "all", liveRoom); });
 $("hallHome").addEventListener("click", () => { renderTabSetup(); show("home"); });
+
+/* 첫 화면 QR: 지금 주소(물음표 뒤는 빼고)를 QR로 */
+// 시작하기 옆 작은 QR: 누르면 크게. 이 컴퓨터 파일로 열었을 때는 학생 탭이 열 수 없으니 안내만
+const homeUrl = location.origin + location.pathname;
+const homeIsLocal = !/^https?:/.test(location.protocol) || /^(localhost|127\.)/.test(location.hostname);
+let homeSvg = "";
+async function makeHomeQr() {
+  if (homeIsLocal) { $("qrMiniBox").innerHTML = "인터넷 주소로 열면 QR이 나와요"; return; }
+  $("qrMiniBox").innerHTML = "⏳";
+  try {
+    await loadQrLib();
+    const qr = qrcode(0, "M"); qr.addData(homeUrl); qr.make();
+    homeSvg = qr.createSvgTag({ cellSize: 6, margin: 1, scalable: true });
+    $("qrMiniBox").innerHTML = homeSvg;
+  } catch (e) { $("qrMiniBox").innerHTML = "QR을 못 만들었어요 (인터넷 확인)"; }
+}
+$("qrMini").addEventListener("click", () => {
+  $("qrUrl").textContent = homeUrl;
+  $("homeQr").innerHTML = homeSvg || `<div class="qr-fail">${homeIsLocal
+    ? "이 컴퓨터 파일로 열려 있어서 학생 탭에서는 열 수 없어요. <b>jjeongi1434-rgb.github.io/drawing-quiz</b> 주소로 연 뒤 QR을 띄워 주세요."
+    : "QR을 만들지 못했어요 (인터넷 확인). 아래 주소를 칠판에 적어 주세요."}</div>`;
+  $("qrPop").hidden = false;
+});
+$("qrClose").addEventListener("click", () => ($("qrPop").hidden = true));
+$("qrPop").addEventListener("click", (e) => { if (e.target === $("qrPop")) $("qrPop").hidden = true; });
 
 function show(id) { ["home", "live", "join", "board", "collect", "intro", "game", "result", "hall"].forEach((s) => ($(s).hidden = s !== id)); window.scrollTo(0, 0); }
 
@@ -1762,6 +1816,7 @@ renderTabSetup();
 {
   const P = new URLSearchParams(location.search);
   if (P.get("live")) openJoin(P.get("live"), P.get("api"), P.get("mix") === "1");
+  if (!P.get("live") && innerWidth > 560) makeHomeQr();
 }
 </script>
 </body>
