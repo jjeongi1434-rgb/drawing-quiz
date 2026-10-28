@@ -289,6 +289,31 @@
 
   .board-link { text-align: center; margin: 0 0 6px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
   @media (max-width: 560px) { .qr-mini { display: none; } }
+  .gate-panel { text-align: center; max-width: 520px; margin: 0 auto 16px; padding: 30px 20px; }
+  .gate-ic { font-size: 64px; line-height: 1.1; }
+  .gate-h { font-family: "Jua"; font-weight: normal; font-size: 28px; margin: 8px 0 6px; }
+  .gate-p { color: var(--ink-soft); font-size: 17px; line-height: 1.6; margin: 0 0 14px; }
+  .gate-p b { font-family: "Jua"; font-weight: normal; color: var(--ink); font-size: 20px; }
+  .sched-state { font-family: "Jua"; font-size: 21px; background: #fbf5ec; border-radius: 16px; padding: 12px 14px; margin-bottom: 12px; }
+  .sched-state.on { background: var(--mint); }
+  .sched-quick { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 8px; }
+  .sched-quick label { font-family: "Jua"; font-size: 17px; }
+  .sched-quick .go { flex: 1; min-width: 140px; }
+  .sched-sub { font-family: "Jua"; font-weight: normal; font-size: 19px; margin: 18px 0 8px; }
+  .sched-add { align-items: end; }
+  .sched-add input[type=date], .sched-add input[type=time] { font: inherit; border: 2px solid var(--line); border-radius: 12px; padding: 6px 8px; background: #fff; }
+  .sched-rep { display: flex; align-items: center; gap: 6px; }
+  .sched-list { display: grid; gap: 8px; margin: 12px 0; }
+  .sched-row { display: flex; align-items: center; gap: 10px; background: var(--sky); border-radius: 14px; padding: 9px 12px; font-family: "Jua"; font-size: 18px; }
+  .sched-row.now { background: var(--mint); }
+  .sched-row span { flex: 1; }
+  .sched-row button { border: none; background: #fff; border-radius: 999px; width: 34px; height: 34px; font-size: 16px; }
+  .room-list { display: grid; gap: 8px; }
+  .room-btn { display: flex; align-items: center; gap: 12px; text-align: left; border: 3px solid transparent; border-radius: 18px; padding: 12px 14px; font-size: 15px; box-shadow: var(--shadow); }
+  .room-btn:active { transform: translateY(3px); }
+  .room-btn .ri { font-size: 32px; }
+  .room-btn b { font-family: "Jua"; font-weight: normal; font-size: 21px; display: block; }
+  .room-btn .rgo { margin-left: auto; font-family: "Jua"; font-size: 18px; background: #fff; border-radius: 999px; padding: 6px 14px; white-space: nowrap; }
   .qr-pop { position: fixed; inset: 0; z-index: 50; background: rgba(90, 70, 54, .45); display: grid; place-items: center; padding: 16px; }
   .qr-pop[hidden] { display: none; }
   .qr-card { background: var(--card); border-radius: 30px; padding: 24px 22px 20px; text-align: center; box-shadow: var(--shadow); max-width: 440px; width: 100%; animation: pop .35s ease-out; }
@@ -431,8 +456,60 @@
 <body>
 <div class="wrap">
 
+  <!-- 문지기: QR을 찍은 기기만, 선생님이 정한 시간에만 열린다 -->
+  <section id="gate">
+    <div class="hero">
+      <div class="deco">🔒 ✏️ 🐱</div>
+      <h1><span class="hl">한 획</span> 그림 퀴즈</h1>
+    </div>
+    <div class="panel gate-panel">
+      <div id="gIcon" class="gate-ic">⏳</div>
+      <h2 id="gTitle" class="gate-h">확인하는 중…</h2>
+      <p id="gMsg" class="gate-p"></p>
+      <button id="gRetry" class="go" hidden>🔄 다시 확인</button>
+    </div>
+    <p class="board-link"><button id="gTeacher" class="link-btn">🧑‍🏫 선생님</button></p>
+  </section>
+
+  <!-- 선생님: 로그인 · 열리는 시간 -->
+  <section id="teach" hidden>
+    <div class="topbar"><button id="teachBack" class="home-btn" title="돌아가기">🏠</button><span class="tag">🧑‍🏫 선생님</span></div>
+    <div id="tLoginBox" class="panel">
+      <h2 class="step-h">선생님 확인</h2>
+      <p class="step-p">이 기기에서 한 번만 하면 돼요. 학생 탭에서는 하지 마세요.</p>
+      <div class="tab-fields">
+        <label class="field"><span>서버 주소</span><input id="apiUrl" placeholder="https://script.google.com/macros/s/…/exec"></label>
+        <label class="field"><span>비밀번호</span><input id="tPin" type="password" inputmode="numeric" autocomplete="off" placeholder="앱스 스크립트에 정한 숫자"></label>
+        <div id="apiInfo" class="tab-info">구글 앱스 스크립트 <b>웹 앱 주소</b>와 <b>선생님 비밀번호</b>를 넣어요. (설정 안내서 참고)</div>
+        <button id="tLogin" class="go">🔑 확인</button>
+      </div>
+    </div>
+    <div id="tSched" hidden>
+      <div class="panel">
+        <h2 class="step-h">🔒 게임이 열리는 시간</h2>
+        <div id="sState" class="sched-state">⏳</div>
+        <div class="sched-quick">
+          <label>지금부터 <select id="sMin"><option value="20">20분</option><option value="40" selected>40분</option><option value="50">50분</option><option value="90">90분</option></select></label>
+          <button id="sOpenNow" class="go">🟢 지금 열기</button>
+          <button id="sCloseNow" class="go soft">🔒 지금 닫기</button>
+        </div>
+        <h3 class="sched-sub">시간 미리 정해 두기</h3>
+        <div class="sel-row sched-add">
+          <label>날짜 <input id="sDate" type="date"></label>
+          <label>시작 <input id="sFrom" type="time" value="09:00"></label>
+          <label>끝 <input id="sTo" type="time" value="09:45"></label>
+          <label class="sched-rep"><input id="sRep" type="checkbox"> 4주 동안 매주</label>
+          <button id="sAdd" class="go">＋ 추가</button>
+        </div>
+        <div id="sList" class="sched-list"></div>
+        <p class="step-p">정한 시간 안에만 학생 탭에서 <b>혼자 하기·모둠 대결·탭 대결·실시간 대결</b>을 모두 할 수 있어요. 이 기기(선생님)는 언제나 열려요.</p>
+      </div>
+      <div class="btns"><button id="tHome" class="go">🏠 게임 첫 화면으로</button><button id="tLogout" class="go soft">이 기기 선생님 해제</button></div>
+    </div>
+  </section>
+
   <!-- 첫 화면 -->
-  <section id="home">
+  <section id="home" hidden>
     <div class="hero">
       <div class="deco">✏️ 🐱 🚗 🍎</div>
       <span class="badge">진짜 사람들이 그린 그림이 한 획씩 나타나요</span>
@@ -457,11 +534,12 @@
         <label class="field solo-field"><input id="soloName" maxlength="10" placeholder="이름을 써요 (안 써도 돼요)"></label>
       </div>
       <div id="liveSetup" class="opt tab-setup" hidden>
-        <span class="lb">선생님 설정</span>
-        <div class="tab-fields">
-          <label class="field"><span>서버 주소</span><input id="apiUrl" placeholder="https://script.google.com/macros/s/…/exec"></label>
-          <div id="apiInfo" class="tab-info">구글 앱스 스크립트 <b>웹 앱 주소</b>를 한 번만 넣어 두면 돼요. (설정 안내서 참고)</div>
-          <div class="live-btns"><button id="apiTest" class="link-btn">🔌 연결 확인</button><button id="openHall" class="link-btn">🏅 명예의 전당</button><button id="openLive" class="go">📡 실시간 대결방 열기</button></div>
+        <span id="liveLb" class="lb">대결방</span>
+        <div id="liveTeacher" class="tab-fields" hidden>
+          <div class="live-btns"><button id="openTeach" class="link-btn">🔒 열리는 시간</button><button id="openHall" class="link-btn">🏅 명예의 전당</button><button id="openLive" class="go">📡 실시간 대결방 열기</button></div>
+        </div>
+        <div id="liveStudent" class="tab-fields">
+          <div id="roomList" class="room-list"></div>
         </div>
       </div>
       <div id="tabSetup" class="opt tab-setup" hidden>
@@ -515,7 +593,7 @@
       <button id="start" class="start">시작하기 🚀</button>
       <button id="qrMini" class="qr-mini" title="크게 보기"><span id="qrMiniBox" class="qr-mini-box"></span><span class="qr-mini-say">📷 찍으면 열려요</span></button>
     </div>
-    <p class="board-link"><button id="openBoard" class="link-btn">🏅 우리 반 순위 보기</button></p>
+    <p class="board-link"><button id="openBoard" class="link-btn">🏅 우리 반 순위 보기</button><button id="homeTeach" class="link-btn" hidden>🧑‍🏫 선생님</button></p>
     <p class="credit">그림 데이터: Google <a href="https://quickdraw.withgoogle.com/data" target="_blank" rel="noopener">Quick, Draw! Dataset</a> (CC BY 4.0) · 그중 일부를 골라 이 파일 안에 넣었어요.</p>
   </section>
 
@@ -853,7 +931,12 @@ function renderTabSetup() {
   const on = opts.mode === "tab" || opts.mode === "live";
   $("tabSetup").hidden = opts.mode !== "tab";
   $("liveSetup").hidden = opts.mode !== "live";
-  $("start").hidden = $("qrMini").hidden = opts.mode === "live"; // 실시간은 선생님이 방을 열고, 학생은 QR로 들어온다
+  $("start").hidden = opts.mode === "live"; // 실시간은 선생님이 방을 열고, 학생은 열린 방을 골라 들어온다
+  $("qrMini").hidden = opts.mode === "live" || !isTeacher(); // 첫 화면 QR은 선생님 기기에서만
+  $("homeTeach").hidden = !isTeacher();
+  $("liveTeacher").hidden = !isTeacher(); $("liveStudent").hidden = isTeacher();
+  $("liveLb").textContent = isTeacher() ? "선생님" : "대결방";
+  if (opts.mode === "live" && !$("home").hidden) pollRooms();
   $("soloSetup").hidden = opts.mode !== "solo";
   // 주제·단계·문제 수는 문제 번호에 들어 있으니 숨기기
   $("topics").hidden = on;
@@ -1090,6 +1173,7 @@ $("jGo").addEventListener("click", async () => {
     if (!res.ok && res.error === "name") { info.className = "tab-info bad"; info.textContent = `"${name}"은(는) 벌써 다른 탭에 있어요. 다른 이름(예: ${name}2)을 써 주세요.`; return; }
     // 한 번만 참여: 이 탭은 벌써 다른 이름으로 했거나, 이 이름으로 이미 풀기 시작했다
     if (!res.ok && res.error === "dev") { info.className = "tab-info bad"; info.textContent = `이 탭은 벌써 "${res.name}"(으)로 참여했어요 (${res.score}점). 대결은 한 번만 할 수 있어요 🙂`; return; }
+    if (!res.ok && res.error === "closed") { info.className = "tab-info bad"; info.textContent = "🔒 지금은 닫혀 있어요. 선생님이 열면 다시 들어와요."; return; }
     if (!res.ok && res.error === "again") { info.className = "tab-info bad"; info.textContent = `"${name}"은(는) 벌써 참여했어요 (${res.score}점). 대결은 한 번만 할 수 있어요 🙂`; return; }
     if (!res.ok) throw new Error(res.error);
     if (res.done) { info.className = "tab-info good"; info.textContent = `벌써 끝냈어요! 내 점수는 ${res.score}점이에요. 칠판을 봐요 📺`; return; }
@@ -1101,32 +1185,189 @@ $("jGo").addEventListener("click", async () => {
   } finally { $("jGo").disabled = false; }
 });
 
-/* 선생님: 서버 주소 저장·연결 확인 */
-$("apiUrl").value = load("hq-api", "");
-$("apiUrl").addEventListener("input", () => save("hq-api", $("apiUrl").value.trim()));
-$("apiTest").addEventListener("click", async () => {
-  const a = $("apiUrl").value.trim(), box = $("apiInfo");
-  if (!a) { box.className = "tab-info bad"; box.textContent = "서버 주소를 먼저 넣어요."; return; }
-  box.className = "tab-info"; box.textContent = "⏳ 연결해 보는 중…";
+/* ---------- 선생님 · 문지기 ----------
+   선생님 기기: 서버 주소 + 비밀번호(hq-api, hq-pin)를 넣어 두면 언제나 열린다.
+   학생 기기: 선생님 칠판의 QR(?api=…)을 한 번 찍어야 서버를 알고(hq-api-join), 정해진 시간에만 열린다. */
+let T = { api: load("hq-api", ""), pin: load("hq-pin", "") };
+let JOIN_API = load("hq-api-join", "");
+const isTeacher = () => !!(T.api && T.pin);
+$("apiUrl").value = T.api;
+const DAYS = ["일", "월", "화", "수", "목", "금", "토"];
+const two = (n) => String(n).padStart(2, "0");
+const hm = (t) => { const d = new Date(t); return `${two(d.getHours())}:${two(d.getMinutes())}`; };
+const md = (t) => { const d = new Date(t); return `${d.getMonth() + 1}/${d.getDate()}(${DAYS[d.getDay()]})`; };
+const sameDay = (a, b) => new Date(a).toDateString() === new Date(b).toDateString();
+const when = (t) => (sameDay(t, Date.now()) ? `오늘 ${hm(t)}` : `${md(t)} ${hm(t)}`);
+
+let gateOpen = false, gateTimer = 0;
+// 문지기 화면 (게임·결과 화면에 있으면 끝날 때까지 그대로 둔다)
+function showGate(kind, st = {}) {
+  gateOpen = false;
+  const g = {
+    qr: ["📷", "선생님 칠판의 QR을 찍어 주세요", "수업 시간에 선생님 칠판에 나오는 QR을 한 번 찍으면 이 기기에서 게임이 열려요."],
+    closed: ["🔒", "지금은 닫혀 있어요", st.next ? `다음 열리는 시간<br><b>${when(st.next)}</b>` : "선생님이 게임을 열면 여기서 바로 시작할 수 있어요."],
+    net: ["📶", "서버에 연결하지 못했어요", "인터넷을 확인하고 다시 눌러 주세요."],
+    wait: ["⏳", "확인하는 중…", ""],
+  }[kind];
+  $("gIcon").textContent = g[0]; $("gTitle").textContent = g[1]; $("gMsg").innerHTML = g[2];
+  $("gRetry").hidden = kind === "qr" || kind === "wait";
+  if (!["intro", "game", "result", "teach"].some((s) => !$(s).hidden)) show("gate");
+}
+// 지금 열려 있는지 서버에 묻기 (선생님 기기는 묻지 않고 연다)
+async function gateCheck(then) {
+  clearTimeout(gateTimer);
+  if (isTeacher()) { gateOpen = true; if (!$("gate").hidden) enterHome(); if (then) then(); return; }
+  if (!JOIN_API) return showGate("qr");
+  if (!gateOpen && !$("gate").hidden) showGate("wait");
   try {
-    const r = await fetchJson(apiFull(a) + "?t=" + Date.now(), {}, 15000);
-    if (!r.ok) throw 0;
-    box.className = "tab-info good"; box.textContent = "✔ 연결됐어요! 이제 대결방을 열 수 있어요.";
+    const s = await fetchJson(`${apiFull(JOIN_API)}?action=status&t=${Date.now()}`, {}, 12000);
+    if (!s.ok || s.open === undefined) throw 0;
+    if (s.open) {
+      gateOpen = true;
+      if (!$("gate").hidden) enterHome();
+      if (then) then();
+      // 닫히는 시각 즈음 다시 확인
+      gateTimer = setTimeout(() => gateCheck(), Math.min(60000, Math.max(5000, (s.until || 0) - s.now + 2000)));
+    } else {
+      showGate("closed", s);
+      gateTimer = setTimeout(() => gateCheck(then), 30000);
+    }
+  } catch (e) {
+    if (!gateOpen) showGate("net");
+    gateTimer = setTimeout(() => gateCheck(then), 20000);
+  }
+}
+$("gRetry").addEventListener("click", () => gateCheck());
+function enterHome() { renderTopics(); renderTabSetup(); show("home"); }
+
+/* 선생님 화면 */
+function openTeach() {
+  $("tLoginBox").hidden = isTeacher(); $("tSched").hidden = !isTeacher();
+  $("tPin").value = "";
+  show("teach");
+  if (isTeacher()) loadSched();
+}
+$("gTeacher").addEventListener("click", openTeach);
+$("homeTeach").addEventListener("click", openTeach);
+$("openTeach").addEventListener("click", openTeach);
+$("teachBack").addEventListener("click", () => (isTeacher() ? enterHome() : (show("gate"), gateCheck())));
+$("tHome").addEventListener("click", enterHome);
+$("tLogin").addEventListener("click", async () => {
+  const a = $("apiUrl").value.trim(), pin = $("tPin").value.trim(), box = $("apiInfo");
+  if (!a || !pin) { box.className = "tab-info bad"; box.textContent = "서버 주소와 비밀번호를 모두 넣어요."; return; }
+  box.className = "tab-info"; box.textContent = "⏳ 확인하는 중…";
+  try {
+    const r = await apiPost(a, { action: "pin", pin });
+    if (r.ok) {
+      T = { api: a, pin }; save("hq-api", a); save("hq-pin", pin);
+      gateOpen = true; clearTimeout(gateTimer);
+      box.className = "tab-info"; box.textContent = "";
+      if (innerWidth > 560) makeHomeQr();
+      openTeach(); return;
+    }
+    box.className = "tab-info bad";
+    box.textContent = r.error === "setpin" ? "앱스 스크립트 코드 맨 위 TEACHER_PIN 의 '0000'을 다른 숫자로 바꾸고 새 버전으로 배포해 주세요."
+      : r.error === "pin" ? "비밀번호가 달라요." : "서버 코드가 예전 것이에요. 새 코드를 붙여 넣고 새 버전으로 배포해 주세요.";
   } catch (e) {
     box.className = "tab-info bad"; box.textContent = "연결이 안 돼요. 주소가 …/exec 로 끝나는지, 배포할 때 '모든 사용자'를 골랐는지 확인해요.";
   }
+});
+$("tLogout").addEventListener("click", () => {
+  if (!confirm("이 기기를 선생님 기기에서 풀까요? 다음에 쓰려면 비밀번호를 다시 넣어야 해요.")) return;
+  if (!JOIN_API && T.api) { JOIN_API = apiShort(T.api); save("hq-api-join", JOIN_API); }
+  T = { api: "", pin: "" }; save("hq-pin", ""); save("hq-api", "");
+  gateOpen = false; show("gate"); gateCheck();
+});
+
+/* 열리는 시간 */
+let SLOTS = [];
+function renderSched(st) {
+  const now = Date.now();
+  $("sState").className = "sched-state" + (st.open ? " on" : "");
+  $("sState").innerHTML = st.open ? `🟢 지금 열려 있어요 · ${when(st.until)}까지` : `🔒 지금은 닫혀 있어요${st.next ? ` · 다음 열림 ${when(st.next)}` : ""}`;
+  SLOTS = (st.slots || SLOTS).slice().sort((a, b) => a.from - b.from);
+  $("sList").innerHTML = SLOTS.length ? SLOTS.map((s, k) => `<div class="sched-row${s.from <= now && now < s.to ? " now" : ""}">
+      <span>${md(s.from)} ${hm(s.from)} ~ ${sameDay(s.from, s.to) ? "" : md(s.to) + " "}${hm(s.to)}</span><button data-k="${k}" title="지우기">✕</button></div>`).join("")
+    : `<div class="live-empty">정해 둔 시간이 없어요. 위에서 <b>지금 열기</b>를 누르거나 시간을 추가해요.</div>`;
+}
+async function loadSched() {
+  $("sState").className = "sched-state"; $("sState").textContent = "⏳ 불러오는 중…";
+  try {
+    const r = await fetchJson(`${apiFull(T.api)}?action=schedule&pin=${encodeURIComponent(T.pin)}&t=${Date.now()}`, {}, 15000);
+    if (!r.ok) throw r.error;
+    renderSched(r);
+  } catch (e) { $("sState").textContent = e === "pin" ? "비밀번호가 바뀌었어요. '이 기기 선생님 해제' 뒤 다시 넣어 주세요." : "불러오지 못했어요 📶 잠시 뒤 다시 열어 주세요."; }
+}
+async function saveSched(slots) {
+  $("sState").className = "sched-state"; $("sState").textContent = "⏳ 저장하는 중…";
+  try {
+    const r = await apiPost(T.api, { action: "schedule", pin: T.pin, slots });
+    if (!r.ok) throw r.error;
+    renderSched(r);
+  } catch (e) { $("sState").textContent = "저장하지 못했어요 📶 다시 눌러 주세요."; }
+}
+$("sOpenNow").addEventListener("click", () => {
+  const now = Date.now();
+  saveSched(SLOTS.filter((s) => !(s.from <= now && now < s.to)).concat({ from: now, to: now + +$("sMin").value * 60000 }));
+});
+$("sCloseNow").addEventListener("click", () => { const now = Date.now(); saveSched(SLOTS.filter((s) => !(s.from <= now && now < s.to))); });
+$("sAdd").addEventListener("click", () => {
+  const d = $("sDate").value, a = $("sFrom").value, b = $("sTo").value;
+  if (!d || !a || !b) return alert("날짜와 시작·끝 시간을 넣어요.");
+  const from = +new Date(`${d}T${a}`), to = +new Date(`${d}T${b}`);
+  if (!(to > from)) return alert("끝 시간이 시작보다 늦어야 해요.");
+  if (to <= Date.now()) return alert("벌써 지난 시간이에요.");
+  const add = [];
+  for (let w = 0; w < ($("sRep").checked ? 4 : 1); w++) add.push({ from: from + w * 7 * 864e5, to: to + w * 7 * 864e5 });
+  saveSched(SLOTS.concat(add));
+});
+$("sList").addEventListener("click", (e) => {
+  const b = e.target.closest("button[data-k]"); if (!b) return;
+  saveSched(SLOTS.filter((_, k) => k !== +b.dataset.k));
+});
+{ const d = new Date(); $("sDate").value = `${d.getFullYear()}-${two(d.getMonth() + 1)}-${two(d.getDate())}`; }
+
+/* 학생: 열린 대결방 목록 (4초마다 새로) */
+let roomTimer = 0;
+async function pollRooms() {
+  clearTimeout(roomTimer);
+  if (isTeacher() || opts.mode !== "live" || $("home").hidden || !JOIN_API) return;
+  const box = $("roomList");
+  try {
+    const r = await fetchJson(`${apiFull(JOIN_API)}?action=rooms&t=${Date.now()}`, {}, 12000);
+    if (!r.ok) throw 0;
+    box.innerHTML = r.rooms.length ? r.rooms.map((x) => {
+      const c = readCode(x.room); if (!c) return "";
+      const g = GROUPS.find((y) => y.id === c.topic);
+      return `<button class="room-btn" data-room="${x.room}" data-mix="${x.mix}" style="background:${g.bg}">
+        <span class="ri">${g.ic}</span><span><b>${x.room}번 방</b>${g.nm} · ${c.level}단계 · ${c.rounds}문제 · 👥 ${x.n}명</span><span class="rgo">들어가기 ➜</span></button>`;
+    }).join("") : `<div class="live-empty">${r.open === false ? "🔒 지금은 닫혀 있어요." : "아직 열린 대결방이 없어요.<br>선생님이 방을 열면 여기에 나와요! ⏳"}</div>`;
+  } catch (e) {
+    box.innerHTML = `<div class="live-empty">대결방을 불러오지 못했어요 📶 다시 시도하는 중…</div>`;
+  }
+  roomTimer = setTimeout(pollRooms, 4000);
+}
+$("roomList").addEventListener("click", (e) => {
+  const b = e.target.closest(".room-btn"); if (!b) return;
+  clearTimeout(roomTimer);
+  openJoin(b.dataset.room, JOIN_API, b.dataset.mix === "1");
 });
 
 /* 선생님 칠판: 대결방 */
 let liveRoom = "", livePoll = 0, liveBusyGet = false, livePlayers = {};
 $("lTopic").innerHTML = GROUPS.map((g) => `<option value="${g.id}">${g.ic} ${g.nm}</option>`).join("");
 $("openLive").addEventListener("click", () => {
-  if (!$("apiUrl").value.trim()) { $("apiInfo").className = "tab-info bad"; $("apiInfo").textContent = "서버 주소를 먼저 넣어요."; return; }
+  if (!isTeacher()) return openTeach();
   $("lTopic").value = opts.topic;
   showLiveMake();
   show("live");
 });
+// 대결방을 학생 목록에 올리고 내리기
+function roomOpen(open) {
+  if (liveRoom && isTeacher()) apiPost(T.api, { action: open ? "open" : "close", room: liveRoom, mix: $("lMix").value === "1", pin: T.pin }).catch(() => {});
+}
 function showLiveMake() {
+  roomOpen(false);
   clearInterval(livePoll); liveRoom = "";
   $("liveMake").hidden = false; $("liveRoom").hidden = true; $("lResult").hidden = true; $("liveCount").hidden = true;
 }
@@ -1159,6 +1400,7 @@ $("lMake").addEventListener("click", async () => {
   }
   livePlayers = {};
   renderLive();
+  roomOpen(true);
   clearInterval(livePoll); livePoll = setInterval(pollLive, 2500); pollLive();
 });
 $("lCopy").addEventListener("click", async () => {
@@ -1202,25 +1444,27 @@ $("lFinish").addEventListener("click", () => {
   const firsts = ranked.filter((t) => t.rank === 1);
   $("lSub").textContent = `${list.length}명 도전 · 1등은 ${firsts.map((t) => t.nm).join(", ")} 🎉`;
   $("liveRoom").hidden = true; $("lResult").hidden = false;
+  roomOpen(false); // 결과를 발표하면 학생 목록에서 내린다
   window.scrollTo(0, 0); confetti();
 });
-$("lBack").addEventListener("click", () => { $("lResult").hidden = true; $("liveRoom").hidden = false; });
+$("lBack").addEventListener("click", () => { $("lResult").hidden = true; $("liveRoom").hidden = false; roomOpen(true); });
 $("lNew").addEventListener("click", () => { if (confirm("새 방을 만들까요? 지금 방의 순위는 화면에서 사라져요.")) showLiveMake(); });
-$("liveHome").addEventListener("click", () => { clearInterval(livePoll); liveRoom = ""; renderTabSetup(); show("home"); });
+$("liveHome").addEventListener("click", () => { roomOpen(false); clearInterval(livePoll); liveRoom = ""; enterHome(); });
 
 /* 명예의 전당: 시트 [기록] 탭의 줄 [시간, 방 번호, 이름, 점수, 맞힌 문제, 문제 수] */
 let hallRows = null, hallRoom = "*";
 $("hTopic").innerHTML = `<option value="*">모든 주제</option>` + GROUPS.map((g) => `<option value="${g.id}">${g.ic} ${g.nm}</option>`).join("");
 async function openHall(topic, level, rounds, period, room = "*") {
   hallRoom = room;
-  const api = $("apiUrl").value.trim();
-  if (!api) { $("apiInfo").className = "tab-info bad"; $("apiInfo").textContent = "서버 주소를 먼저 넣어요."; return; }
+  if (!isTeacher()) return openTeach();
+  const api = T.api;
   $("hTopic").value = topic; $("hLevel").value = String(level); $("hRounds").value = String(rounds); $("hPeriod").value = period;
   hallRows = null;
   $("hShow").hidden = true; $("hEmpty").hidden = false; $("hEmpty").innerHTML = "⏳ 구글 시트에서 기록을 불러오는 중…";
   show("hall");
   try {
-    const res = await fetchJson(`${apiFull(api)}?action=records&t=${Date.now()}`, {}, 15000);
+    const res = await fetchJson(`${apiFull(api)}?action=records&pin=${encodeURIComponent(T.pin)}&t=${Date.now()}`, {}, 15000);
+    if (res.error === "pin" || res.error === "setpin") { $("hEmpty").innerHTML = "선생님 비밀번호가 맞지 않아요.<br>🧑‍🏫 선생님 화면에서 다시 넣어 주세요."; return; }
     if (!res.rows) { $("hEmpty").innerHTML = "서버 코드가 예전 것이에요.<br>앱스 스크립트에 <b>새 코드</b>를 붙여 넣고 <b>새 버전으로 배포</b>해 주세요."; return; }
     hallRows = res.rows;
     renderHall();
@@ -1283,11 +1527,12 @@ function renderHall() {
 $("hRoom").addEventListener("change", () => { hallRoom = $("hRoom").value; renderHall(); });
 $("openHall").addEventListener("click", () => openHall(opts.topic, "*", opts.rounds, "week"));
 $("lHall").addEventListener("click", () => { const c = readCode(liveRoom); openHall(c.topic, c.level, c.rounds, "all", liveRoom); });
-$("hallHome").addEventListener("click", () => { renderTabSetup(); show("home"); });
+$("hallHome").addEventListener("click", enterHome);
 
 /* 첫 화면 QR: 지금 주소(물음표 뒤는 빼고)를 QR로 */
 // 시작하기 옆 작은 QR: 누르면 크게. 이 컴퓨터 파일로 열었을 때는 학생 탭이 열 수 없으니 안내만
-const homeUrl = location.origin + location.pathname;
+const homeBase = location.origin + location.pathname;
+const homeLink = () => homeBase + (isTeacher() ? `?api=${encodeURIComponent(apiShort(T.api))}` : "");
 const homeIsLocal = !/^https?:/.test(location.protocol) || /^(localhost|127\.)/.test(location.hostname);
 let homeSvg = "";
 async function makeHomeQr() {
@@ -1295,13 +1540,13 @@ async function makeHomeQr() {
   $("qrMiniBox").innerHTML = "⏳";
   try {
     await loadQrLib();
-    const qr = qrcode(0, "M"); qr.addData(homeUrl); qr.make();
+    const qr = qrcode(0, "M"); qr.addData(homeLink()); qr.make();
     homeSvg = qr.createSvgTag({ cellSize: 6, margin: 1, scalable: true });
     $("qrMiniBox").innerHTML = homeSvg;
   } catch (e) { $("qrMiniBox").innerHTML = "QR을 못 만들었어요 (인터넷 확인)"; }
 }
 $("qrMini").addEventListener("click", () => {
-  $("qrUrl").textContent = homeUrl;
+  $("qrUrl").textContent = homeBase;
   $("homeQr").innerHTML = homeSvg || `<div class="qr-fail">${homeIsLocal
     ? "이 컴퓨터 파일로 열려 있어서 학생 탭에서는 열 수 없어요. <b>jjeongi1434-rgb.github.io/drawing-quiz</b> 주소로 연 뒤 QR을 띄워 주세요."
     : "QR을 만들지 못했어요 (인터넷 확인). 아래 주소를 칠판에 적어 주세요."}</div>`;
@@ -1310,7 +1555,13 @@ $("qrMini").addEventListener("click", () => {
 $("qrClose").addEventListener("click", () => ($("qrPop").hidden = true));
 $("qrPop").addEventListener("click", (e) => { if (e.target === $("qrPop")) $("qrPop").hidden = true; });
 
-function show(id) { ["home", "live", "join", "board", "collect", "intro", "game", "result", "hall"].forEach((s) => ($(s).hidden = s !== id)); window.scrollTo(0, 0); }
+function show(id) {
+  // 닫힌 시간에 첫 화면으로 돌아오면 문지기로 (게임 중에는 끝까지 할 수 있다)
+  if (id === "home" && !gateOpen && !isTeacher()) { id = "gate"; setTimeout(() => gateCheck(), 0); }
+  ["gate", "teach", "home", "live", "join", "board", "collect", "intro", "game", "result", "hall"].forEach((s) => ($(s).hidden = s !== id));
+  window.scrollTo(0, 0);
+  if (id === "home") pollRooms();
+}
 
 function startGame(skipIntro) {
   let set = opts, tab = null;
@@ -1812,11 +2063,14 @@ $("toHome").addEventListener("click", () => {
 renderTopics();
 renderTeamSetup();
 renderTabSetup();
-// QR로 열렸으면 바로 대결방 입장 화면으로
+// QR로 열렸으면 서버 열쇠를 이 기기에 기억하고, 열린 시간이면 첫 화면(대결방 QR이면 입장 화면)으로
 {
   const P = new URLSearchParams(location.search);
-  if (P.get("live")) openJoin(P.get("live"), P.get("api"), P.get("mix") === "1");
-  if (!P.get("live") && innerWidth > 560) makeHomeQr();
+  if (P.get("api") && !isTeacher()) { JOIN_API = P.get("api"); save("hq-api-join", JOIN_API); }
+  if (P.get("api")) history.replaceState(null, "", homeBase); // 주소창에 서버 열쇠를 남기지 않기
+  const room = P.get("live"), mix = P.get("mix") === "1";
+  gateCheck(room ? () => { if (!LIVE) openJoin(room, JOIN_API || T.api, mix); } : null);
+  if (isTeacher() && innerWidth > 560) makeHomeQr();
 }
 </script>
 </body>
