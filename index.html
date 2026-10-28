@@ -742,7 +742,12 @@
       <p id="jSet"></p>
     </div>
     <div class="panel join-panel">
-      <label class="field"><span>나</span><input id="jName" readonly></label>
+      <div id="jReg" class="join-panel" hidden>
+        <div id="jKind" class="chips"><button class="chip on" data-v="s">🙋 학생</button><button class="chip" data-v="t">🧑‍🏫 선생님</button></div>
+        <label id="jSidBox" class="field"><span>학번</span><input id="jSid" maxlength="6" inputmode="numeric" autocomplete="off" placeholder="예: 10203 (시험 학번)"></label>
+        <label class="field"><span>이름</span><input id="jNm" maxlength="10" autocomplete="off" placeholder="내 이름"></label>
+      </div>
+      <label id="jMe" class="field"><span>나</span><input id="jName" readonly></label>
       <div id="jInfo" class="tab-info">들어가면 칠판에 내 점수가 실시간으로 나와요!</div>
     </div>
     <button id="jGo" class="start">들어가기 🚀</button>
@@ -1255,23 +1260,44 @@ function openJoin(room, api, mix) {
   const g = GROUPS.find((x) => x.id === c.topic);
   $("jCode").textContent = room;
   $("jSet").textContent = `${lvName(c.level)} · ${g.ic} ${g.nm} · ${c.rounds}문제 · ${mix ? "친구마다 다른 그림이 나와요!" : "모두 같은 그림이 나와요!"}`;
-  $("jName").value = showNm(myKey());
-  $("jInfo").className = "tab-info";
-  $("jInfo").textContent = ME ? "등록한 이름으로 들어가요. 칠판에 내 점수가 실시간으로 나와요!" : "학번·이름을 먼저 등록해야 들어갈 수 있어요. 🏠 처음 화면에서 등록해 주세요.";
+  renderJoinMe();
   show("join");
   return true;
 }
+let joinKind = "s";
+function renderJoinMe() {
+  $("jReg").hidden = !!ME; $("jMe").hidden = !ME;
+  $("jName").value = showNm(myKey());
+  $("jSidBox").hidden = joinKind === "t";
+  $("jNm").placeholder = joinKind === "t" ? "선생님 이름" : "내 이름";
+  $("jKind").querySelectorAll(".chip").forEach((c) => c.classList.toggle("on", c.dataset.v === joinKind));
+  $("jInfo").className = "tab-info";
+  $("jInfo").innerHTML = ME ? "등록한 이름으로 들어가요. 칠판에 내 점수가 실시간으로 나와요!"
+    : "처음이면 <b>학번·이름</b>(선생님은 이름)을 쓰고 들어가요.<br>⚠ 한 번 등록하면 이 기기에서는 바꿀 수 없어요.";
+}
+$("jKind").addEventListener("click", (e) => {
+  const c = e.target.closest(".chip"); if (!c) return;
+  joinKind = c.dataset.v; renderJoinMe();
+  (joinKind === "t" ? $("jNm") : $("jSid")).focus();
+});
 $("jGo").addEventListener("click", async () => {
-  const name = myKey(), info = $("jInfo");
-  if (!name) { info.className = "tab-info bad"; info.textContent = "이름을 먼저 써요 ✏️"; $("jName").focus(); return; }
-  info.className = "tab-info"; info.textContent = "⏳ 대결방에 들어가는 중…";
+  const info = $("jInfo");
   $("jGo").disabled = true;
+  // 처음 온 기기: 여기서 바로 등록
+  if (!ME) {
+    info.className = "tab-info"; info.textContent = "⏳ 등록하는 중…";
+    const err = await registerMe(joinKind === "t", $("jSid").value, $("jNm").value);
+    if (err) { info.className = "tab-info bad"; info.innerHTML = err; $("jGo").disabled = false; return; }
+    renderJoinMe(); renderTopics();
+  }
+  const name = myKey();
+  info.className = "tab-info"; info.textContent = "⏳ 대결방에 들어가는 중…";
   try {
     const res = await apiPost(LIVE.api, { action: "join", room: LIVE.room, name, dev: devId, total: +readCode(LIVE.room).rounds });
     if (!res.ok && res.error === "name") { info.className = "tab-info bad"; info.textContent = `"${name}"은(는) 벌써 다른 탭에 있어요. 다른 이름(예: ${name}2)을 써 주세요.`; return; }
     // 한 번만 참여: 이 탭은 벌써 다른 이름으로 했거나, 이 이름으로 이미 풀기 시작했다
     if (!res.ok && res.error === "dev") { info.className = "tab-info bad"; info.textContent = `이 탭은 벌써 "${res.name}"(으)로 참여했어요 (${res.score}점). 대결은 한 번만 할 수 있어요 🙂`; return; }
-    if (!res.ok && res.error === "me") { info.className = "tab-info bad"; info.textContent = "학번·이름 등록이 지워졌어요. 🏠 처음 화면에서 다시 등록해 주세요."; return; }
+    if (!res.ok && res.error === "me") { ME = null; save("hq-me", null); renderJoinMe(); info.className = "tab-info bad"; info.textContent = "학번·이름 등록이 지워졌어요. 위에 다시 쓰고 들어가요."; return; }
     if (!res.ok && res.error === "closed") { info.className = "tab-info bad"; info.textContent = "🔒 지금은 닫혀 있어요. 선생님이 열면 다시 들어와요."; return; }
     if (!res.ok && res.error === "again") { info.className = "tab-info bad"; info.textContent = `"${name}"은(는) 벌써 참여했어요 (${res.score}점). 대결은 한 번만 할 수 있어요 🙂`; return; }
     if (!res.ok) throw new Error(res.error);
@@ -1329,7 +1355,7 @@ async function gateCheck(then) {
       ME = s.me ? { sid: s.me.sid, name: s.me.name } : null; save("hq-me", ME);
       if (was !== myKey()) renderTopics();
     }
-    if (s.open && !ME) { gateOpen = true; whoThen = then; return showWho(true); }
+    if (s.open && !ME) { gateOpen = true; if (then) return then(); return showWho(true); }
     if (s.open) {
       gateOpen = true;
       if (!$("gate").hidden || !$("who").hidden) enterHome();
@@ -1363,15 +1389,13 @@ function showWho(form, kind = whoKind) {
 $("whoS").addEventListener("click", () => (JOIN_API ? showWho(true, "s") : showGate("qr")));
 $("whoT").addEventListener("click", () => (JOIN_API ? showWho(true, "t") : showGate("qr")));
 $("whoA").addEventListener("click", openTeach);
-$("mGo").addEventListener("click", async () => {
-  const tch = whoKind === "t", name = $("mName").value.trim().replace(/\s+/g, " "), info = $("mInfo");
-  let sid = tch ? TCLS + two(Math.floor(Math.random() * 100)) : $("mSid").value.trim();
-  const bad = (t) => { info.className = "tab-info bad"; info.innerHTML = t; };
-  if (!tch && (!/^\d{4,6}$/.test(sid) || sid.startsWith("000"))) return bad("학번은 숫자 4~6자리로 써요. (예: 1학년 2반 3번 → 10203)");
-  if (!name) return bad("이름을 써요 ✏️");
-  if (!confirm(`${tch ? `${name} 선생님` : `학번 ${sid}, 이름 ${name}`}\n맞나요? 등록하면 이 기기에서는 바꿀 수 없어요.`)) return;
-  info.className = "tab-info"; info.textContent = "⏳ 등록하는 중…";
-  $("mGo").disabled = true;
+// 학번·이름 등록: 잘 되면 "", 안 되면 보여 줄 안내 글 (tch: 게임에 참여하는 선생님은 이름만)
+async function registerMe(tch, sidIn, nameIn) {
+  const name = nameIn.trim().replace(/\s+/g, " ");
+  let sid = tch ? TCLS + two(Math.floor(Math.random() * 100)) : sidIn.trim();
+  if (!tch && (!/^\d{4,6}$/.test(sid) || sid.startsWith("000"))) return "학번은 숫자 4~6자리로 써요. (예: 1학년 2반 3번 → 10203)";
+  if (!name) return "이름을 써요 ✏️";
+  if (!confirm(`${tch ? `${name} 선생님` : `학번 ${sid}, 이름 ${name}`}\n맞나요? 등록하면 이 기기에서는 바꿀 수 없어요.`)) return "취소했어요. 확인하고 다시 눌러 주세요.";
   try {
     let r = await apiPost(SERVER, { action: "me", dev: devId, sid, name });
     // 선생님 번호가 겹치면 다른 번호로 다시
@@ -1379,16 +1403,24 @@ $("mGo").addEventListener("click", async () => {
       sid = TCLS + two(Math.floor(Math.random() * 100));
       r = await apiPost(SERVER, { action: "me", dev: devId, sid, name });
     }
-    if (!r.ok && r.error === "dev") { ME = { sid: r.sid, name: r.name }; save("hq-me", ME); alert(`이 기기는 벌써 ${showNm(r.sid + " " + r.name)}(으)로 등록돼 있어요. 그 이름으로 해요.`); }
-    else if (!r.ok && r.error === "sid") return bad("이 학번은 벌써 <b>다른 기기</b>에서 등록했어요.<br>내 기기가 바뀌었으면 선생님께 말해 주세요.");
-    else if (!r.ok && r.error === "closed") return bad("🔒 지금은 닫혀 있어요. 게임이 열린 시간에 등록해요.");
-    else if (!r.ok) throw 0;
-    else { ME = { sid, name }; save("hq-me", ME); }
-    info.className = "tab-info"; info.innerHTML = "⚠ 한 번 등록하면 이 기기에서는 <b>학번·이름을 바꿀 수 없어요.</b> 정확히 써요!";
-    const then = whoThen; whoThen = null;
-    gateOpen = false; gateCheck(then);
-  } catch (e) { bad("서버에 연결하지 못했어요. 인터넷을 확인하고 다시 눌러 주세요 📶"); }
-  finally { $("mGo").disabled = false; }
+    if (!r.ok && r.error === "dev") { ME = { sid: r.sid, name: r.name }; save("hq-me", ME); alert(`이 기기는 벌써 ${showNm(r.sid + " " + r.name)}(으)로 등록돼 있어요. 그 이름으로 해요.`); return ""; }
+    if (!r.ok && r.error === "sid") return "이 학번은 벌써 <b>다른 기기</b>에서 등록했어요.<br>내 기기가 바뀌었으면 선생님께 말해 주세요.";
+    if (!r.ok && r.error === "closed") return "🔒 지금은 닫혀 있어요. 게임이 열린 시간에 등록해요.";
+    if (!r.ok) throw 0;
+    ME = { sid, name }; save("hq-me", ME);
+    return "";
+  } catch (e) { return "서버에 연결하지 못했어요. 인터넷을 확인하고 다시 눌러 주세요 📶"; }
+}
+$("mGo").addEventListener("click", async () => {
+  const info = $("mInfo");
+  info.className = "tab-info"; info.textContent = "⏳ 등록하는 중…";
+  $("mGo").disabled = true;
+  const err = await registerMe(whoKind === "t", $("mSid").value, $("mName").value);
+  $("mGo").disabled = false;
+  if (err) { info.className = "tab-info bad"; info.innerHTML = err; return; }
+  info.className = "tab-info"; info.innerHTML = "⚠ 한 번 등록하면 이 기기에서는 <b>학번·이름을 바꿀 수 없어요.</b> 정확히 써요!";
+  const then = whoThen; whoThen = null;
+  gateOpen = false; gateCheck(then);
 });
 
 /* 선생님 화면 */
