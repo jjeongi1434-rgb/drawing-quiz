@@ -326,6 +326,10 @@
   .sched-row span { flex: 1; }
   .sched-row button { border: none; background: #fff; border-radius: 999px; width: 34px; height: 34px; font-size: 16px; }
   .room-list { display: grid; gap: 8px; }
+  .t-rooms { margin-top: 12px; display: grid; gap: 8px; }
+  .t-rooms-h { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-family: "Jua"; font-size: 19px; }
+  .t-rooms-h .go { margin-left: auto; font-size: 17px; padding: 8px 16px; }
+  .room-btn button.rgo { border: none; cursor: pointer; }
   .room-btn { display: flex; align-items: center; gap: 12px; text-align: left; border: 3px solid transparent; border-radius: 18px; padding: 12px 14px; font-size: 15px; box-shadow: var(--shadow); }
   .room-btn:active { transform: translateY(3px); }
   .room-btn .ri { font-size: 32px; }
@@ -482,15 +486,15 @@
     </div>
     <div class="who-pick">
       <button id="whoS" class="who-btn" style="background:var(--aqua)"><span class="wi">🙋</span>학생<small>학번 · 이름</small></button>
-      <button id="whoT" class="who-btn" style="background:var(--lavender)"><span class="wi">🧑‍🏫</span>선생님<small>이름 · 비밀번호</small></button>
+      <button id="whoT" class="who-btn" style="background:var(--lavender)"><span class="wi">🧑‍🏫</span>선생님<small>이름</small></button>
     </div>
     <div id="whoForm" class="panel join-panel" hidden>
-      <label class="field"><span>학번</span><input id="mSid" maxlength="6" inputmode="numeric" autocomplete="off" placeholder="예: 10203 (시험 학번)"></label>
+      <label id="mSidBox" class="field"><span>학번</span><input id="mSid" maxlength="6" inputmode="numeric" autocomplete="off" placeholder="예: 10203 (시험 학번)"></label>
       <label class="field"><span>이름</span><input id="mName" maxlength="10" autocomplete="off" placeholder="내 이름"></label>
       <div id="mInfo" class="tab-info">⚠ 한 번 등록하면 이 기기에서는 <b>학번·이름을 바꿀 수 없어요.</b> 정확히 써요!</div>
       <button id="mGo" class="go">✔ 등록하기</button>
     </div>
-    <p class="board-link"><button class="link-btn install-btn" hidden>📲 앱으로 설치</button></p>
+    <p class="board-link"><button class="link-btn install-btn" hidden>📲 앱으로 설치</button><button id="whoA" class="link-btn">🔑 관리자</button></p>
   </section>
 
   <!-- 문지기: QR을 찍은 기기만, 선생님이 정한 시간에만 열린다 -->
@@ -505,19 +509,19 @@
       <p id="gMsg" class="gate-p"></p>
       <button id="gRetry" class="go" hidden>🔄 다시 확인</button>
     </div>
-    <p class="board-link"><button id="gTeacher" class="link-btn">🧑‍🏫 선생님</button></p>
+    <p class="board-link"><button id="gTeacher" class="link-btn">🔑 관리자</button></p>
   </section>
 
   <!-- 선생님: 로그인 · 열리는 시간 -->
   <section id="teach" hidden>
-    <div class="topbar"><button id="teachBack" class="home-btn" title="돌아가기">🏠</button><span class="tag">🧑‍🏫 선생님</span></div>
+    <div class="topbar"><button id="teachBack" class="home-btn" title="돌아가기">🏠</button><span class="tag">🔑 관리자</span></div>
     <div id="tLoginBox" class="panel">
-      <h2 class="step-h">선생님 확인</h2>
+      <h2 class="step-h">관리자 확인</h2>
       <p class="step-p">이 기기에서 한 번만 하면 돼요. 학생 탭에서는 하지 마세요.</p>
       <div class="tab-fields">
         <label class="field"><span>이름</span><input id="tName" maxlength="10" autocomplete="off" placeholder="예: 김희정"></label>
         <label class="field"><span>비밀번호</span><input id="tPin" type="password" inputmode="numeric" autocomplete="off" placeholder="앱스 스크립트에 정한 숫자"></label>
-        <div id="apiInfo" class="tab-info">이름과 <b>선생님 비밀번호</b>를 넣어요.</div>
+        <div id="apiInfo" class="tab-info">게임을 관리하는 선생님(김희정)만 써요. 이름과 <b>관리자 비밀번호</b>를 넣어요.<br>게임에 참여하는 선생님은 처음 화면에서 <b>🧑‍🏫 선생님</b>을 골라요.</div>
         <button id="tLogin" class="go">🔑 확인</button>
       </div>
     </div>
@@ -541,7 +545,7 @@
         <div id="sList" class="sched-list"></div>
         <p class="step-p">정한 시간 안에만 학생 탭에서 <b>혼자 하기·모둠 대결·탭 대결·실시간 대결</b>을 모두 할 수 있어요. 이 기기(선생님)는 언제나 열려요.</p>
       </div>
-      <div class="btns"><button id="tHome" class="go">🏠 게임 첫 화면으로</button><button id="tLogout" class="go soft">이 기기 선생님 해제</button></div>
+      <div class="btns"><button id="tHome" class="go">🏠 게임 첫 화면으로</button><button id="tLogout" class="go soft">이 기기 관리자 해제</button></div>
     </div>
   </section>
 
@@ -574,6 +578,10 @@
         <span id="liveLb" class="lb">대결방</span>
         <div id="liveTeacher" class="tab-fields" hidden>
           <div class="live-btns"><button id="openTeach" class="link-btn">🔒 열리는 시간</button><button id="openHall" class="link-btn">🏅 명예의 전당</button><button id="openLive" class="go">📡 실시간 대결방 열기</button></div>
+          <div class="t-rooms">
+            <div class="t-rooms-h">📋 지금 열린 대결방 <span id="tRoomN"></span><button id="tCloseAll" class="go soft" hidden>🗑 모두 닫기</button></div>
+            <div id="tRooms" class="room-list"></div>
+          </div>
         </div>
         <div id="liveStudent" class="tab-fields">
           <div id="roomList" class="room-list"></div>
@@ -630,7 +638,7 @@
       <button id="start" class="start">시작하기 🚀</button>
       <button id="qrMini" class="qr-mini" title="크게 보기"><span id="qrMiniBox" class="qr-mini-box"></span><span class="qr-mini-say">📷 찍으면 열려요</span></button>
     </div>
-    <p class="board-link"><button id="openBoard" class="link-btn">🏅 우리 반 순위 보기</button><button id="homeTeach" class="link-btn" hidden>🧑‍🏫 선생님</button><button class="link-btn install-btn" hidden>📲 앱으로 설치</button></p>
+    <p class="board-link"><button id="openBoard" class="link-btn">🏅 우리 반 순위 보기</button><button id="homeTeach" class="link-btn" hidden>🔑 관리자</button><button class="link-btn install-btn" hidden>📲 앱으로 설치</button></p>
     <p class="credit">그림 데이터: Google <a href="https://quickdraw.withgoogle.com/data" target="_blank" rel="noopener">Quick, Draw! Dataset</a> (CC BY 4.0) · 그중 일부를 골라 이 파일 안에 넣었어요.</p>
   </section>
 
@@ -915,6 +923,12 @@ function bestKey(topic, name) { return name ? `${name}|${topic}` : topic; }
 // 이 기기에 등록한 학생 { sid: 학번, name: 이름 } — 한 번 등록하면 바꿀 수 없다
 let ME = load("hq-me", null);
 const myKey = () => (ME ? `${ME.sid} ${ME.name}` : "");
+// 게임에 참여하는 선생님: 학번 자리에 "000" + 두 자리 번호 (학생 학번은 000으로 시작하지 않는다)
+const TCLS = "000";
+const isTsid = (sid) => /^000\d\d$/.test(String(sid));
+const meTeacher = () => !!(ME && isTsid(ME.sid));
+// 칠판·순위에 보일 이름: "10203 민지" 그대로, 선생님은 "김OO 선생님"
+const showNm = (nm) => String(nm).replace(/^000\d\d (.+)$/, "$1 선생님");
 
 /* 모둠 대결: 모둠 모양과 색 */
 const TEAMS = [
@@ -977,10 +991,11 @@ function renderTabSetup() {
   $("qrMini").hidden = opts.mode === "live" || !isTeacher(); // 첫 화면 QR은 선생님 기기에서만
   $("homeTeach").hidden = !isTeacher();
   $("liveTeacher").hidden = !isTeacher(); $("liveStudent").hidden = isTeacher();
-  $("liveLb").textContent = isTeacher() ? "선생님" : "대결방";
+  $("liveLb").textContent = isTeacher() ? "관리자" : "대결방";
   if (opts.mode === "live" && !$("home").hidden) pollRooms();
   $("soloSetup").hidden = opts.mode === "team";
-  $("meBox").innerHTML = isTeacher() ? `🧑‍🏫 ${esc(T.name || "")} 선생님 <small>선생님 점수는 순위에 올라가지 않아요</small>`
+  $("meBox").innerHTML = isTeacher() ? `🔑 관리자 ${esc(T.name || "")} <small>관리자 점수는 순위에 올라가지 않아요</small>`
+    : meTeacher() ? `🧑‍🏫 ${esc(ME.name)} 선생님 <small>선생님 점수도 순위에 함께 올라가요</small>`
     : ME ? `🙋 ${esc(ME.sid)} ${esc(ME.name)} <small>등록한 학번·이름으로 기록돼요</small>` : "";
   // 주제·단계·문제 수는 문제 번호에 들어 있으니 숨기기
   $("topics").hidden = on;
@@ -1082,8 +1097,8 @@ function periodFrom(p) {
   return d.getTime();
 }
 const clsOf = (sid) => String(sid).slice(0, -2);
-const clsName = (c) => (c.length >= 2 ? `${c[0]}학년 ${+c.slice(1)}반` : `${c}반`);
-const clsShort = (c) => (c.length >= 2 ? `${c[0]}-${+c.slice(1)}` : c);
+const clsName = (c) => (c === TCLS ? "🧑‍🏫 선생님" : c.length >= 2 ? `${c[0]}학년 ${+c.slice(1)}반` : `${c}반`);
+const clsShort = (c) => (c === TCLS ? "선생님" : c.length >= 2 ? `${c[0]}-${+c.slice(1)}` : c);
 // 처음 나온 이름부터 차례로 동물을 정해 두고, 다음에도 같은 동물·색을 쓴다
 const avatars = load("hq-avatars", {});
 function avatar(name) {
@@ -1122,7 +1137,7 @@ function renderBoard() {
   if (ME && !isTeacher() && !classes.includes(clsOf(ME.sid))) classes.unshift(clsOf(ME.sid));
   const mine = ME && !isTeacher() ? clsOf(ME.sid) : "";
   scope.innerHTML = (isTeacher() ? [["*", "🏫 전체"], ...classes.map((c) => [c, clsName(c)])]
-    : [[mine, `우리 반 (${clsName(mine)})`], ["*", "🏫 전체"]]).map(([v, t]) => `<option value="${v}">${t}</option>`).join("");
+    : [[mine, mine === TCLS ? "🧑‍🏫 선생님끼리" : `우리 반 (${clsName(mine)})`], ["*", "🏫 전체"]]).map(([v, t]) => `<option value="${v}">${t}</option>`).join("");
   scope.value = [...scope.options].some((o) => o.value === had) ? had : scope.options[0].value;
   const all = scope.value === "*";
   const rows = boardRows.filter((r) => all || clsOf(r.sid) === scope.value);
@@ -1130,7 +1145,7 @@ function renderBoard() {
   if (!rows.length) return boardMsg("🙋 아직 기록이 없어요.<br><b>혼자 하기</b>를 끝까지 하면 여기에 올라와요!");
   $("bEmpty").hidden = true; $("bShow").hidden = false;
   const list = rows.map((r) => ({ ...avatar(`${r.sid} ${r.name}`), raw: r.sid,
-    nm: esc(isTeacher() ? `${r.sid} ${r.name}` : all ? `${r.name} (${clsShort(clsOf(r.sid))})` : r.name), score: r.score, right: r.right }));
+    nm: esc(isTsid(r.sid) ? `${r.name} 선생님` : isTeacher() ? `${r.sid} ${r.name}` : all ? `${r.name} (${clsShort(clsOf(r.sid))})` : r.name), score: r.score, right: r.right }));
   const g = GROUPS.find((x) => x.id === $("bTopic").value);
   $("bTitle").textContent = `${g.ic} ${g.nm} · ${$("bLevel").value}단계 · ${$("bRounds").value}문제`;
   const ranked = renderRanking(list, "bPodium", "bRankList");
@@ -1204,7 +1219,7 @@ async function liveMyRank() {
     try {
       const res = await apiGet(LIVE.api, LIVE.room);
       if (!res.ok) throw 0;
-      const list = Object.entries(res.players || {}).map(([nm, p]) => ({ ...avatar(nm), raw: nm, nm: esc(nm), score: p.score, right: p.right, done: p.done }));
+      const list = Object.entries(res.players || {}).map(([nm, p]) => ({ ...avatar(nm), raw: nm, nm: esc(showNm(nm)), score: p.score, right: p.right, done: p.done }));
       const ranked = renderRanking(list, "lrPodium", "lrList");
       const me = ranked.find((p) => p.raw === LIVE.name);
       [...$("lrList").children].forEach((row, i) => {
@@ -1233,12 +1248,12 @@ function openJoin(room, api, mix) {
   const g = GROUPS.find((x) => x.id === c.topic);
   $("jCode").textContent = room;
   $("jSet").textContent = `${g.ic} ${g.nm} · ${c.level}단계 · ${c.rounds}문제 · ${mix ? "친구마다 다른 그림이 나와요!" : "모두 같은 그림이 나와요!"}`;
-  $("jName").value = myKey();
+  $("jName").value = showNm(myKey());
   show("join");
   return true;
 }
 $("jGo").addEventListener("click", async () => {
-  const name = $("jName").value.trim(), info = $("jInfo");
+  const name = myKey(), info = $("jInfo");
   if (!name) { info.className = "tab-info bad"; info.textContent = "이름을 먼저 써요 ✏️"; $("jName").focus(); return; }
   info.className = "tab-info"; info.textContent = "⏳ 대결방에 들어가는 중…";
   $("jGo").disabled = true;
@@ -1325,25 +1340,37 @@ $("gRetry").addEventListener("click", () => gateCheck());
 function enterHome() { renderTopics(); renderTabSetup(); show("home"); }
 
 /* 처음 화면: 학생 / 선생님 고르기, 학생은 학번·이름 등록 (한 기기에 한 번만) */
-function showWho(form) {
+let whoKind = "s"; // s: 학생, t: 게임에 참여하는 선생님
+function showWho(form, kind = whoKind) {
   ["gate", "teach", "home", "live", "join", "board", "collect", "intro", "game", "result", "hall"].forEach((s) => ($(s).hidden = true));
   $("who").hidden = false;
-  $("whoForm").hidden = !form; $("whoS").classList.toggle("on", !!form);
-  if (form) setTimeout(() => $("mSid").focus(), 50);
+  whoKind = kind;
+  $("whoForm").hidden = !form;
+  $("whoS").classList.toggle("on", !!form && kind === "s"); $("whoT").classList.toggle("on", !!form && kind === "t");
+  $("mSidBox").hidden = kind === "t";
+  $("mName").placeholder = kind === "t" ? "선생님 이름 (예: 김희정)" : "내 이름";
+  if (form) setTimeout(() => (kind === "t" ? $("mName") : $("mSid")).focus(), 50);
 }
-$("whoS").addEventListener("click", () => (JOIN_API ? showWho(true) : showGate("qr")));
-$("whoT").addEventListener("click", openTeach);
+$("whoS").addEventListener("click", () => (JOIN_API ? showWho(true, "s") : showGate("qr")));
+$("whoT").addEventListener("click", () => (JOIN_API ? showWho(true, "t") : showGate("qr")));
+$("whoA").addEventListener("click", openTeach);
 $("mGo").addEventListener("click", async () => {
-  const sid = $("mSid").value.trim(), name = $("mName").value.trim().replace(/\s+/g, " "), info = $("mInfo");
+  const tch = whoKind === "t", name = $("mName").value.trim().replace(/\s+/g, " "), info = $("mInfo");
+  let sid = tch ? TCLS + two(Math.floor(Math.random() * 100)) : $("mSid").value.trim();
   const bad = (t) => { info.className = "tab-info bad"; info.innerHTML = t; };
-  if (!/^\d{4,6}$/.test(sid)) return bad("학번은 숫자 4~6자리로 써요. (예: 1학년 2반 3번 → 10203)");
+  if (!tch && (!/^\d{4,6}$/.test(sid) || sid.startsWith("000"))) return bad("학번은 숫자 4~6자리로 써요. (예: 1학년 2반 3번 → 10203)");
   if (!name) return bad("이름을 써요 ✏️");
-  if (!confirm(`학번 ${sid}, 이름 ${name}\n맞나요? 등록하면 이 기기에서는 바꿀 수 없어요.`)) return;
+  if (!confirm(`${tch ? `${name} 선생님` : `학번 ${sid}, 이름 ${name}`}\n맞나요? 등록하면 이 기기에서는 바꿀 수 없어요.`)) return;
   info.className = "tab-info"; info.textContent = "⏳ 등록하는 중…";
   $("mGo").disabled = true;
   try {
-    const r = await apiPost(SERVER, { action: "me", dev: devId, sid, name });
-    if (!r.ok && r.error === "dev") { ME = { sid: r.sid, name: r.name }; save("hq-me", ME); alert(`이 기기는 벌써 ${r.sid} ${r.name}(으)로 등록돼 있어요. 그 이름으로 해요.`); }
+    let r = await apiPost(SERVER, { action: "me", dev: devId, sid, name });
+    // 선생님 번호가 겹치면 다른 번호로 다시
+    for (let k = 0; tch && !r.ok && r.error === "sid" && k < 8; k++) {
+      sid = TCLS + two(Math.floor(Math.random() * 100));
+      r = await apiPost(SERVER, { action: "me", dev: devId, sid, name });
+    }
+    if (!r.ok && r.error === "dev") { ME = { sid: r.sid, name: r.name }; save("hq-me", ME); alert(`이 기기는 벌써 ${showNm(r.sid + " " + r.name)}(으)로 등록돼 있어요. 그 이름으로 해요.`); }
     else if (!r.ok && r.error === "sid") return bad("이 학번은 벌써 <b>다른 기기</b>에서 등록했어요.<br>내 기기가 바뀌었으면 선생님께 말해 주세요.");
     else if (!r.ok && r.error === "closed") return bad("🔒 지금은 닫혀 있어요. 게임이 열린 시간에 등록해요.");
     else if (!r.ok) throw 0;
@@ -1388,7 +1415,7 @@ $("tLogin").addEventListener("click", async () => {
   }
 });
 $("tLogout").addEventListener("click", () => {
-  if (!confirm("이 기기를 선생님 기기에서 풀까요? 다음에 쓰려면 비밀번호를 다시 넣어야 해요.")) return;
+  if (!confirm("이 기기를 관리자 기기에서 풀까요? 다음에 쓰려면 비밀번호를 다시 넣어야 해요.")) return;
   JOIN_API = SERVER; save("hq-api-join", "1");
   T = { api: SERVER, pin: "", name: "" }; save("hq-pin", ""); save("hq-tname", "");
   gateOpen = false;
@@ -1445,13 +1472,28 @@ $("sList").addEventListener("click", (e) => {
 
 /* 학생: 열린 대결방 목록 (4초마다 새로) */
 let roomTimer = 0;
+let tRoomList = [];
 async function pollRooms() {
   clearTimeout(roomTimer);
-  if (isTeacher() || opts.mode !== "live" || $("home").hidden || !JOIN_API) return;
-  const box = $("roomList");
+  if (opts.mode !== "live" || $("home").hidden || !(JOIN_API || isTeacher())) return;
+  const teach = isTeacher(), box = teach ? $("tRooms") : $("roomList");
   try {
-    const r = await fetchJson(`${apiFull(JOIN_API)}?action=rooms&t=${Date.now()}`, {}, 12000);
+    const r = await fetchJson(`${SERVER}?action=rooms&t=${Date.now()}`, {}, 12000);
     if (!r.ok) throw 0;
+    if (teach) {
+      // 선생님: 열린 방을 한눈에, 하나씩 또는 모두 닫기
+      tRoomList = r.rooms.filter((x) => readCode(x.room));
+      $("tRoomN").textContent = tRoomList.length ? `${tRoomList.length}개` : "";
+      $("tCloseAll").hidden = tRoomList.length < 2;
+      box.innerHTML = tRoomList.length ? tRoomList.map((x) => {
+        const c = readCode(x.room), g = GROUPS.find((y) => y.id === c.topic);
+        return `<div class="room-btn" style="background:${g.bg}"><span class="ri">${g.ic}</span>
+          <span><b>${x.room}번 방</b>${g.nm} · ${c.level}단계 · ${c.rounds}문제 · 👥 ${x.n}명 · ${hm(x.t)}에 열림</span>
+          <button class="rgo" data-close="${x.room}">✕ 닫기</button></div>`;
+      }).join("") : `<div class="live-empty">${r.open === false ? "🔒 게임이 닫혀 있어서 열린 방이 안 보여요. (방은 연 지 3시간이 지나면 저절로 사라져요)" : "지금 열린 대결방이 없어요."}</div>`;
+      roomTimer = setTimeout(pollRooms, 4000);
+      return;
+    }
     box.innerHTML = r.rooms.length ? r.rooms.map((x) => {
       const c = readCode(x.room); if (!c) return "";
       const g = GROUPS.find((y) => y.id === c.topic);
@@ -1463,6 +1505,20 @@ async function pollRooms() {
   }
   roomTimer = setTimeout(pollRooms, 4000);
 }
+async function closeRooms(list) {
+  $("tCloseAll").disabled = true;
+  await Promise.all(list.map((room) => apiPost(SERVER, { action: "close", room, pin: T.pin }).catch(() => {})));
+  if (list.includes(liveRoom)) liveRoom = "";
+  $("tCloseAll").disabled = false;
+  pollRooms();
+}
+$("tRooms").addEventListener("click", (e) => {
+  const b = e.target.closest("[data-close]"); if (!b) return;
+  if (confirm(`${b.dataset.close}번 방을 닫을까요? 학생 목록에서 사라져요.`)) closeRooms([b.dataset.close]);
+});
+$("tCloseAll").addEventListener("click", () => {
+  if (confirm(`열린 대결방 ${tRoomList.length}개를 모두 닫을까요? 학생 목록에서 모두 사라져요.`)) closeRooms(tRoomList.map((x) => x.room));
+});
 $("roomList").addEventListener("click", (e) => {
   const b = e.target.closest(".room-btn"); if (!b) return;
   clearTimeout(roomTimer);
@@ -1548,7 +1604,7 @@ function renderLive(before = {}) {
     const changed = !before[p.nm] || before[p.nm].score !== p.score;
     return `<div class="lrow${changed ? " up" : ""}" style="background:${p.bg}">
       <span class="lk">${medal[p.rank] || p.rank}</span><span class="li">${p.ic}</span>
-      <span class="ln">${p.nm.replace(/</g, "&lt;")}${p.done ? " ✔" : ""}</span>
+      <span class="ln">${esc(showNm(p.nm))}${p.done ? " ✔" : ""}</span>
       <span><div class="lp"><i style="width:${Math.round(100 * p.step / (p.total || 1))}%;background:${p.deep}"></i></div><div class="lpt">${p.done ? "끝!" : `${p.step} / ${p.total}문제`}</div></span>
       <span class="ls">${p.score}점</span></div>`;
   }).join("");
@@ -1623,7 +1679,7 @@ function renderHall() {
     else if (c.rounds !== rounds || (topic !== "*" && c.topic !== topic) || (level !== "*" && c.level !== level)) return;
     if (!best[nm] || score > best[nm].score) best[nm] = { score, right, t, topic: c.topic };
   });
-  const list = Object.entries(best).map(([nm, r]) => ({ ...avatar(nm), nm: esc(nm), ...r }));
+  const list = Object.entries(best).map(([nm, r]) => ({ ...avatar(nm), nm: esc(showNm(nm)), ...r }));
   $("hEmpty").hidden = list.length > 0; $("hShow").hidden = list.length === 0;
   if (!list.length) { $("hEmpty").innerHTML = "🏅 이 조건으로 끝까지 푼 기록이 아직 없어요.<br><b>기간</b>이나 <b>주제</b>를 바꿔 보세요!"; return; }
   const g = GROUPS.find((x) => x.id === topic);
@@ -1694,7 +1750,7 @@ function startGame(skipIntro) {
   if (opts.mode === "live") {
     const c = readCode(LIVE.room);
     set = { ...opts, ...c, auto: "1" };
-    tab = { ...avatar(LIVE.name), nm: LIVE.name, code: LIVE.room, live: true };
+    tab = { ...avatar(LIVE.name), nm: showNm(LIVE.name), code: LIVE.room, live: true };
     // 아이마다 다르게: 이름을 섞은 번호로 고른다 (같은 이름으로 다시 들어와도 같은 문제)
     let h = c.seed;
     if (LIVE.mix) for (const ch of LIVE.name) h = Math.imul(h ^ ch.codePointAt(0), 16777619);
@@ -2150,7 +2206,7 @@ async function soloSend(r0) {
       if (r.error === "me" || r.error === "dev") { box.textContent = "학번·이름 등록이 바뀌었어요. 🏠 처음 화면으로 가 주세요."; ME = null; save("hq-me", null); return; }
       if (!r.ok) throw 0;
       const nw = r.prev !== null && r0.score > r.prev ? ` · 🎉 최고 점수 새 기록! (전에는 ${r.prev}점)` : "";
-      box.innerHTML = `🏅 우리 반 <b>${r.cls.rank}등</b> / ${r.cls.n}명 · 🏫 전체 <b>${r.all.rank}등</b> / ${r.all.n}명<br><small>내 최고 점수 ${r.best}점${nw}</small>`;
+      box.innerHTML = `🏅 ${meTeacher() ? "선생님끼리" : "우리 반"} <b>${r.cls.rank}등</b> / ${r.cls.n}명 · 🏫 전체 <b>${r.all.rank}등</b> / ${r.all.n}명<br><small>내 최고 점수 ${r.best}점${nw}</small>`;
       return;
     } catch (e) { await new Promise((ok) => setTimeout(ok, 3000)); }
   }
