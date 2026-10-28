@@ -4,12 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>한 획 그림 퀴즈</title>
-<link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#ffb08a">
-<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" href="icon-192.png">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="한 획 퀴즈">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap" rel="stylesheet">
 <style>
@@ -543,7 +539,13 @@
           <button id="sAdd" class="go">＋ 추가</button>
         </div>
         <div id="sList" class="sched-list"></div>
-        <p class="step-p">정한 시간 안에만 학생 탭에서 <b>혼자 하기·모둠 대결·탭 대결·실시간 대결</b>을 모두 할 수 있어요. 이 기기(선생님)는 언제나 열려요.</p>
+        <h3 class="sched-sub">📲 앱 설치 비밀번호</h3>
+        <div class="sel-row sched-add">
+          <label>비밀번호 <input id="sInst" maxlength="20" autocomplete="off" placeholder="예: 7351"></label>
+          <button id="sInstSave" class="go">저장</button>
+        </div>
+        <p id="sInstMsg" class="step-p">이 비밀번호를 아는 기기만 탭에 앱을 깔 수 있어요. 비워 두면 아무도 설치할 수 없어요. (관리자 기기는 언제나 설치돼요)</p>
+        <p class="step-p">정한 시간 안에만 학생 탭에서 <b>혼자 하기·모둠 대결·탭 대결·실시간 대결</b>을 모두 할 수 있어요. 이 기기(관리자)는 언제나 열려요.</p>
       </div>
       <div class="btns"><button id="tHome" class="go">🏠 게임 첫 화면으로</button><button id="tLogout" class="go soft">이 기기 관리자 해제</button></div>
     </div>
@@ -1249,6 +1251,8 @@ function openJoin(room, api, mix) {
   $("jCode").textContent = room;
   $("jSet").textContent = `${g.ic} ${g.nm} · ${c.level}단계 · ${c.rounds}문제 · ${mix ? "친구마다 다른 그림이 나와요!" : "모두 같은 그림이 나와요!"}`;
   $("jName").value = showNm(myKey());
+  $("jInfo").className = "tab-info";
+  $("jInfo").textContent = ME ? "등록한 이름으로 들어가요. 칠판에 내 점수가 실시간으로 나와요!" : "학번·이름을 먼저 등록해야 들어갈 수 있어요. 🏠 처음 화면에서 등록해 주세요.";
   show("join");
   return true;
 }
@@ -1439,8 +1443,18 @@ async function loadSched() {
     const r = await fetchJson(`${apiFull(T.api)}?action=schedule&pin=${encodeURIComponent(T.pin)}&t=${Date.now()}`, {}, 15000);
     if (!r.ok) throw r.error;
     renderSched(r);
-  } catch (e) { $("sState").textContent = e === "pin" ? "비밀번호가 바뀌었어요. '이 기기 선생님 해제' 뒤 다시 넣어 주세요." : "불러오지 못했어요 📶 잠시 뒤 다시 열어 주세요."; }
+    $("sInst").value = r.inst || "";
+  } catch (e) { $("sState").textContent = e === "pin" ? "비밀번호가 바뀌었어요. '이 기기 관리자 해제' 뒤 다시 넣어 주세요." : "불러오지 못했어요 📶 잠시 뒤 다시 열어 주세요."; }
 }
+$("sInstSave").addEventListener("click", async () => {
+  const msg = $("sInstMsg");
+  msg.textContent = "⏳ 저장하는 중…";
+  try {
+    const r = await apiPost(SERVER, { action: "inst", pin: T.pin, code: $("sInst").value.trim() });
+    if (!r.ok) throw 0;
+    msg.innerHTML = r.inst ? `✔ 저장했어요. 학생·선생님 기기에서 <b>📲 앱으로 설치</b>를 누르고 <b>${esc(r.inst)}</b>를 넣으면 깔려요.` : "✔ 비워 두었어요. 이제 아무도 앱을 설치할 수 없어요.";
+  } catch (e) { msg.textContent = "저장하지 못했어요. 서버 코드가 version 6인지, 인터넷이 되는지 확인해 주세요."; }
+});
 async function saveSched(slots) {
   $("sState").className = "sched-state"; $("sState").textContent = "⏳ 저장하는 중…";
   try {
@@ -2252,11 +2266,34 @@ let installEv = null;
 const standalone = matchMedia("(display-mode: standalone)").matches || navigator.standalone;
 const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 const showInstall = (on) => document.querySelectorAll(".install-btn").forEach((b) => (b.hidden = !on));
-if ("serviceWorker" in navigator && /^https?:/.test(location.protocol)) navigator.serviceWorker.register("sw.js").catch(() => {});
-window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); installEv = e; showInstall(true); });
+// 관리자가 정한 '앱 설치 비밀번호'를 넣은 기기(또는 관리자 기기)에만 앱 정보(manifest)를 붙인다
+let instOk = load("hq-inst", false);
+function enableApp() {
+  if (document.querySelector('link[rel="manifest"]')) return;
+  const add = (tag, at) => { const el = document.createElement(tag); Object.assign(el, at); document.head.appendChild(el); };
+  add("link", { rel: "manifest", href: "manifest.json" });
+  add("link", { rel: "apple-touch-icon", href: "apple-touch-icon.png" });
+  add("meta", { name: "apple-mobile-web-app-capable", content: "yes" });
+  add("meta", { name: "apple-mobile-web-app-title", content: "한 획 퀴즈" });
+  if ("serviceWorker" in navigator && /^https?:/.test(location.protocol)) navigator.serviceWorker.register("sw.js").catch(() => {});
+}
+if (instOk || isTeacher() || standalone) enableApp();
+window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); installEv = e; });
 window.addEventListener("appinstalled", () => { installEv = null; showInstall(false); });
-if (isIos && !standalone) showInstall(true);
+showInstall(!standalone);
 document.querySelectorAll(".install-btn").forEach((b) => b.addEventListener("click", async () => {
+  if (!instOk && !isTeacher()) {
+    const code = (prompt("📲 앱 설치 비밀번호를 넣어요.\n(선생님께 물어보세요)") || "").trim();
+    if (!code) return;
+    try {
+      const r = await apiPost(SERVER, { action: "instCheck", code });
+      if (!r.ok) return alert(r.error === "none" ? "아직 앱 설치 비밀번호가 정해지지 않았어요. 관리자 선생님께 말해 주세요." : r.error === "code" ? "비밀번호가 달라요 🙂" : "서버 코드가 예전 것이에요. 관리자 선생님께 말해 주세요.");
+    } catch (e) { return alert("서버에 연결하지 못했어요. 인터넷을 확인해 주세요 📶"); }
+    instOk = true; save("hq-inst", true); enableApp();
+    document.querySelectorAll(".install-btn").forEach((x) => (x.textContent = "📲 지금 설치하기"));
+    return alert("✔ 확인됐어요! 2~3초 뒤 '📲 지금 설치하기'를 한 번 더 누르면 설치돼요.");
+  }
+  enableApp();
   if (installEv) { installEv.prompt(); await installEv.userChoice; installEv = null; showInstall(false); return; }
   alert("아이패드·아이폰: 사파리 아래(또는 위)의 공유 버튼 ⬆ → '홈 화면에 추가'를 누르면 앱처럼 깔려요.\n갤럭시 탭: 크롬 오른쪽 위 ⋮ → '앱 설치' 또는 '홈 화면에 추가'를 눌러요.");
 }));
