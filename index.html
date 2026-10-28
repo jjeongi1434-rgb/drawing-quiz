@@ -4,6 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>한 획 그림 퀴즈</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#ffb08a">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="한 획 퀴즈">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap" rel="stylesheet">
 <style>
@@ -286,6 +292,17 @@
   .live-actions { display: flex; gap: 10px; flex-wrap: wrap; }
   .live-actions .go { flex: 1; }
   .join-panel { max-width: 560px; margin: 0 auto; display: grid; gap: 10px; }
+  .who-pick { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; max-width: 560px; margin: 0 auto 18px; }
+  .who-btn { border: 3px solid transparent; border-radius: 26px; padding: 22px 10px; display: grid; gap: 4px; justify-items: center;
+    font-family: "Jua"; font-size: 26px; cursor: pointer; box-shadow: 0 6px 0 rgba(0,0,0,.08); transition: transform .1s; }
+  .who-btn .wi { font-size: 54px; }
+  .who-btn small { font-family: inherit; font-size: 15px; opacity: .7; }
+  .who-btn.on { border-color: var(--peach-deep); transform: translateY(-3px); }
+  .me-box { font-family: "Jua"; font-size: 21px; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; }
+  .me-box small { font-family: inherit; font-size: 14px; opacity: .6; }
+  .r-rank { background: var(--lavender); border-radius: 18px; padding: 10px 16px; font-family: "Jua"; font-size: 21px; line-height: 1.5; display: inline-block; }
+  .r-rank small { font-size: 16px; opacity: .8; }
+  .r-rank b { font-size: 26px; }
 
   .board-link { text-align: center; margin: 0 0 6px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
   @media (max-width: 560px) { .qr-mini { display: none; } }
@@ -456,6 +473,26 @@
 <body>
 <div class="wrap">
 
+  <!-- 처음: 학생(학번·이름 등록)인지 선생님인지 -->
+  <section id="who" hidden>
+    <div class="hero">
+      <div class="deco">✏️ 🐱 🚗 🍎</div>
+      <h1><span class="hl">한 획</span> 그림 퀴즈</h1>
+      <p>누구인지 먼저 골라요!</p>
+    </div>
+    <div class="who-pick">
+      <button id="whoS" class="who-btn" style="background:var(--aqua)"><span class="wi">🙋</span>학생<small>학번 · 이름</small></button>
+      <button id="whoT" class="who-btn" style="background:var(--lavender)"><span class="wi">🧑‍🏫</span>선생님<small>이름 · 비밀번호</small></button>
+    </div>
+    <div id="whoForm" class="panel join-panel" hidden>
+      <label class="field"><span>학번</span><input id="mSid" maxlength="6" inputmode="numeric" autocomplete="off" placeholder="예: 10203 (시험 학번)"></label>
+      <label class="field"><span>이름</span><input id="mName" maxlength="10" autocomplete="off" placeholder="내 이름"></label>
+      <div id="mInfo" class="tab-info">⚠ 한 번 등록하면 이 기기에서는 <b>학번·이름을 바꿀 수 없어요.</b> 정확히 써요!</div>
+      <button id="mGo" class="go">✔ 등록하기</button>
+    </div>
+    <p class="board-link"><button class="link-btn install-btn" hidden>📲 앱으로 설치</button></p>
+  </section>
+
   <!-- 문지기: QR을 찍은 기기만, 선생님이 정한 시간에만 열린다 -->
   <section id="gate">
     <div class="hero">
@@ -478,9 +515,9 @@
       <h2 class="step-h">선생님 확인</h2>
       <p class="step-p">이 기기에서 한 번만 하면 돼요. 학생 탭에서는 하지 마세요.</p>
       <div class="tab-fields">
-        <label class="field"><span>서버 주소</span><input id="apiUrl" placeholder="https://script.google.com/macros/s/…/exec"></label>
+        <label class="field"><span>이름</span><input id="tName" maxlength="10" autocomplete="off" placeholder="예: 김희정"></label>
         <label class="field"><span>비밀번호</span><input id="tPin" type="password" inputmode="numeric" autocomplete="off" placeholder="앱스 스크립트에 정한 숫자"></label>
-        <div id="apiInfo" class="tab-info">구글 앱스 스크립트 <b>웹 앱 주소</b>와 <b>선생님 비밀번호</b>를 넣어요. (설정 안내서 참고)</div>
+        <div id="apiInfo" class="tab-info">이름과 <b>선생님 비밀번호</b>를 넣어요.</div>
         <button id="tLogin" class="go">🔑 확인</button>
       </div>
     </div>
@@ -530,8 +567,8 @@
         </div>
       </div>
       <div id="soloSetup" class="opt">
-        <span class="lb">내 이름</span>
-        <label class="field solo-field"><input id="soloName" maxlength="10" placeholder="이름을 써요 (안 써도 돼요)"></label>
+        <span class="lb">나</span>
+        <div id="meBox" class="me-box"></div>
       </div>
       <div id="liveSetup" class="opt tab-setup" hidden>
         <span id="liveLb" class="lb">대결방</span>
@@ -593,7 +630,7 @@
       <button id="start" class="start">시작하기 🚀</button>
       <button id="qrMini" class="qr-mini" title="크게 보기"><span id="qrMiniBox" class="qr-mini-box"></span><span class="qr-mini-say">📷 찍으면 열려요</span></button>
     </div>
-    <p class="board-link"><button id="openBoard" class="link-btn">🏅 우리 반 순위 보기</button><button id="homeTeach" class="link-btn" hidden>🧑‍🏫 선생님</button></p>
+    <p class="board-link"><button id="openBoard" class="link-btn">🏅 우리 반 순위 보기</button><button id="homeTeach" class="link-btn" hidden>🧑‍🏫 선생님</button><button class="link-btn install-btn" hidden>📲 앱으로 설치</button></p>
     <p class="credit">그림 데이터: Google <a href="https://quickdraw.withgoogle.com/data" target="_blank" rel="noopener">Quick, Draw! Dataset</a> (CC BY 4.0) · 그중 일부를 골라 이 파일 안에 넣었어요.</p>
   </section>
 
@@ -690,13 +727,13 @@
       <p id="jSet"></p>
     </div>
     <div class="panel join-panel">
-      <label class="field"><span>내 이름</span><input id="jName" maxlength="10" placeholder="별명이나 번호도 좋아요"></label>
-      <div id="jInfo" class="tab-info">이름을 쓰고 들어가요. 칠판에 내 점수가 실시간으로 나와요!</div>
+      <label class="field"><span>나</span><input id="jName" readonly></label>
+      <div id="jInfo" class="tab-info">들어가면 칠판에 내 점수가 실시간으로 나와요!</div>
     </div>
     <button id="jGo" class="start">들어가기 🚀</button>
   </section>
 
-  <!-- 우리 반 순위 (이 기기에서 이름을 쓰고 한 혼자 하기 최고 점수) -->
+  <!-- 우리 반 순위 (서버 [혼자 기록]: 학생마다 혼자 하기 최고 점수) -->
   <section id="board" hidden>
     <div class="topbar"><button id="boardHome" class="home-btn" title="처음으로">🏠</button><span class="tag">🏅 우리 반 순위</span></div>
     <div class="panel board-filter">
@@ -704,16 +741,19 @@
         <label>주제 <select id="bTopic"></select></label>
         <label>단계 <select id="bLevel"><option value="1">1단계</option><option value="2">2단계</option><option value="3">3단계</option></select></label>
         <label>문제 수 <select id="bRounds"><option value="5">5문제</option><option value="10">10문제</option><option value="15">15문제</option></select></label>
+        <label>기간 <select id="bPeriod"><option value="day">오늘</option><option value="week">이번 주</option><option value="month">이번 달</option><option value="all">전체 기간</option></select></label>
+        <label>보기 <select id="bScope"></select></label>
+        <button id="bReload" class="link-btn">🔄 새로 보기</button>
       </div>
-      <p class="step-p">같은 주제·단계·문제 수로 한 친구들끼리 비교해요. 이름마다 가장 높은 점수만 올라가요.</p>
+      <p class="step-p">같은 주제·단계·문제 수로 한 친구들끼리 비교해요. 학생마다 가장 높은 점수만 올라가요. 순위는 게임이 열린 시간에만 볼 수 있어요.</p>
     </div>
-    <div id="bEmpty" class="board-empty" hidden>🙋 아직 기록이 없어요.<br>첫 화면에서 <b>내 이름</b>을 쓰고 게임을 해 보세요!</div>
+    <div id="bEmpty" class="board-empty" hidden></div>
     <div id="bShow">
       <div class="res-hero"><h1 id="bTitle"></h1><p id="bSub"></p></div>
       <div id="bPodium" class="podium"></div>
       <div class="panel"><div id="bRankList" class="rank-list"></div></div>
     </div>
-    <div class="btns"><button id="bClear" class="go soft">🧹 이 순위 비우기</button></div>
+    <div class="btns"><button id="bClear" class="go soft" hidden>🧹 이 순위 지우기 (선생님)</button></div>
   </section>
 
   <!-- 탭 대결 진행판 (선생님 칠판) -->
@@ -801,6 +841,7 @@
       <div class="medal"><div><div id="rTotal" class="big">0</div><small id="rMax">점</small></div></div>
       <h1 id="rTitle"></h1>
       <p id="rSub"></p>
+      <p id="rRank" class="r-rank" hidden></p>
     </div>
     <div class="panel"><div id="gallery" class="gallery"></div></div>
     <div class="btns">
@@ -871,8 +912,9 @@ const opts = { topic: load("hq-topic", "all"), level: "1", rounds: "10", auto: "
 const best = load("hq-best", {});
 // 이름이 없으면 예전처럼 주제 이름만, 이름이 있으면 "이름|주제"
 function bestKey(topic, name) { return name ? `${name}|${topic}` : topic; }
-$("soloName").value = load("hq-soloname", "");
-$("soloName").addEventListener("input", () => { save("hq-soloname", $("soloName").value); renderTopics(); });
+// 이 기기에 등록한 학생 { sid: 학번, name: 이름 } — 한 번 등록하면 바꿀 수 없다
+let ME = load("hq-me", null);
+const myKey = () => (ME ? `${ME.sid} ${ME.name}` : "");
 
 /* 모둠 대결: 모둠 모양과 색 */
 const TEAMS = [
@@ -904,7 +946,7 @@ $("teamNames").addEventListener("input", (e) => {
 function renderTopics() {
   $("topics").innerHTML = GROUPS.map((g) => {
     const cnt = g.id === "all" ? DATA.length : DATA.filter((c) => c.g === g.id).length;
-    const b = best[bestKey(g.id, $("soloName").value.trim())];
+    const b = best[bestKey(g.id, myKey())];
     return `<button class="topic${opts.topic === g.id ? " on" : ""}" data-t="${g.id}" style="background:${g.bg}">
       <div class="ic">${g.ic}</div><div class="nm">${g.nm}</div>
       <div class="ds">그림 ${cnt}종</div>
@@ -937,7 +979,9 @@ function renderTabSetup() {
   $("liveTeacher").hidden = !isTeacher(); $("liveStudent").hidden = isTeacher();
   $("liveLb").textContent = isTeacher() ? "선생님" : "대결방";
   if (opts.mode === "live" && !$("home").hidden) pollRooms();
-  $("soloSetup").hidden = opts.mode !== "solo";
+  $("soloSetup").hidden = opts.mode === "team";
+  $("meBox").innerHTML = isTeacher() ? `🧑‍🏫 ${esc(T.name || "")} 선생님 <small>선생님 점수는 순위에 올라가지 않아요</small>`
+    : ME ? `🙋 ${esc(ME.sid)} ${esc(ME.name)} <small>등록한 학번·이름으로 기록돼요</small>` : "";
   // 주제·단계·문제 수는 문제 번호에 들어 있으니 숨기기
   $("topics").hidden = on;
   ["level", "rounds", "auto"].forEach((k) => (document.querySelector(`[data-opt="${k}"]`).closest(".opt").hidden = on));
@@ -1027,20 +1071,19 @@ let Q = null;          // 지금 문제
 let anim = 0;          // requestAnimationFrame 번호
 let autoTimer = 0, nextTimer = 0;
 
-/* ---------- 우리 반 순위: { "주제|단계|문제 수": { 이름: { score, right, n } } } ---------- */
-const board = load("hq-board", {});
-const boardKey = (topic, level, rounds) => `${topic}|${level}|${rounds}`;
-function boardList(key) {
-  return Object.entries(board[key] || {}).map(([nm, r]) => ({ nm, ...r })).sort((a, b) => b.score - a.score);
+/* ---------- 우리 반 순위: 서버 [혼자 기록]에서 학생마다 최고 점수 ----------
+   학번 끝 두 자리(번호)를 뺀 앞부분이 같으면 같은 반 (10203 → 1학년 2반) */
+const PERIODS = { day: "오늘", week: "이번 주", month: "이번 달", all: "전체 기간" };
+function periodFrom(p) {
+  if (p === "all") return 0;
+  const d = new Date(); d.setHours(0, 0, 0, 0);
+  if (p === "week") d.setDate(d.getDate() - ((d.getDay() + 6) % 7));
+  if (p === "month") d.setDate(1);
+  return d.getTime();
 }
-// 이름마다 최고 점수만 남기고, 지금 몇 등인지 돌려준다
-function recordBoard(topic, level, rounds, name, score, right, n) {
-  const key = boardKey(topic, level, rounds), rows = (board[key] = board[key] || {});
-  if (!rows[name] || score > rows[name].score) rows[name] = { score, right, n };
-  save("hq-board", board);
-  const mine = rows[name].score;
-  return 1 + Object.values(rows).filter((r) => r.score > mine).length;
-}
+const clsOf = (sid) => String(sid).slice(0, -2);
+const clsName = (c) => (c.length >= 2 ? `${c[0]}학년 ${+c.slice(1)}반` : `${c}반`);
+const clsShort = (c) => (c.length >= 2 ? `${c[0]}-${+c.slice(1)}` : c);
 // 처음 나온 이름부터 차례로 동물을 정해 두고, 다음에도 같은 동물·색을 쓴다
 const avatars = load("hq-avatars", {});
 function avatar(name) {
@@ -1048,38 +1091,70 @@ function avatar(name) {
   return TEAMS[avatars[name]];
 }
 $("bTopic").innerHTML = GROUPS.map((g) => `<option value="${g.id}">${g.ic} ${g.nm}</option>`).join("");
-let boardMe = "";
-function openBoard(topic, level, rounds, me) {
+let boardRows = null;
+$("bPeriod").value = load("hq-bperiod", "all");
+function openBoard(topic, level, rounds) {
   $("bTopic").value = topic; $("bLevel").value = String(level); $("bRounds").value = String(rounds);
-  boardMe = me || "";
-  renderBoard(); show("board");
+  show("board"); loadBoard();
+}
+function boardMsg(html) {
+  $("bEmpty").innerHTML = html; $("bEmpty").hidden = false; $("bShow").hidden = true;
+}
+async function loadBoard() {
+  boardRows = null;
+  $("bClear").hidden = true;
+  boardMsg("⏳ 순위를 불러오는 중…");
+  const q = `action=rank&topic=${encodeURIComponent($("bTopic").value)}&level=${$("bLevel").value}&rounds=${$("bRounds").value}&from=${periodFrom($("bPeriod").value)}`;
+  try {
+    const r = await fetchJson(`${SERVER}?${q}${isTeacher() ? `&pin=${encodeURIComponent(T.pin)}` : ""}&t=${Date.now()}`, {}, 15000);
+    if (r.error === "closed") return boardMsg("🔒 순위는 게임이 열린 시간에만 볼 수 있어요.");
+    if (!r.ok) throw 0;
+    if (!r.rows) return boardMsg("서버 코드가 예전 것이에요.<br>앱스 스크립트에 <b>새 코드</b>를 붙여 넣고 <b>새 버전으로 배포</b>해 주세요.");
+    boardRows = r.rows;
+    renderBoard();
+  } catch (e) { boardMsg("📶 순위를 불러오지 못했어요.<br><b>🔄 새로 보기</b>를 눌러 주세요."); }
 }
 function renderBoard() {
-  const key = boardKey($("bTopic").value, $("bLevel").value, $("bRounds").value);
-  const list = boardList(key).map((r) => ({ ...avatar(r.nm), nm: r.nm, score: r.score, right: r.right }));
-  $("bEmpty").hidden = list.length > 0;
-  $("bShow").hidden = list.length === 0;
-  $("bClear").hidden = list.length === 0;
-  if (!list.length) return;
+  if (!boardRows) return;
+  // 보기: 학생은 우리 반 / 전체, 선생님은 전체 / 반마다
+  const scope = $("bScope"), had = scope.value;
+  const classes = [...new Set(boardRows.map((r) => clsOf(r.sid)))].sort();
+  if (ME && !isTeacher() && !classes.includes(clsOf(ME.sid))) classes.unshift(clsOf(ME.sid));
+  const mine = ME && !isTeacher() ? clsOf(ME.sid) : "";
+  scope.innerHTML = (isTeacher() ? [["*", "🏫 전체"], ...classes.map((c) => [c, clsName(c)])]
+    : [[mine, `우리 반 (${clsName(mine)})`], ["*", "🏫 전체"]]).map(([v, t]) => `<option value="${v}">${t}</option>`).join("");
+  scope.value = [...scope.options].some((o) => o.value === had) ? had : scope.options[0].value;
+  const all = scope.value === "*";
+  const rows = boardRows.filter((r) => all || clsOf(r.sid) === scope.value);
+  $("bClear").hidden = !isTeacher() || !boardRows.length;
+  if (!rows.length) return boardMsg("🙋 아직 기록이 없어요.<br><b>혼자 하기</b>를 끝까지 하면 여기에 올라와요!");
+  $("bEmpty").hidden = true; $("bShow").hidden = false;
+  const list = rows.map((r) => ({ ...avatar(`${r.sid} ${r.name}`), raw: r.sid,
+    nm: esc(isTeacher() ? `${r.sid} ${r.name}` : all ? `${r.name} (${clsShort(clsOf(r.sid))})` : r.name), score: r.score, right: r.right }));
   const g = GROUPS.find((x) => x.id === $("bTopic").value);
   $("bTitle").textContent = `${g.ic} ${g.nm} · ${$("bLevel").value}단계 · ${$("bRounds").value}문제`;
   const ranked = renderRanking(list, "bPodium", "bRankList");
   const firsts = ranked.filter((t) => t.rank === 1);
-  $("bSub").textContent = `${list.length}명 도전 · 1등은 ${firsts.map((t) => t.nm).join(", ")} 🎉`;
-  // 방금 한 친구 줄은 눈에 띄게
+  $("bSub").innerHTML = `${all ? "🏫 전체" : clsName(scope.value)} · ${PERIODS[$("bPeriod").value]} · ${list.length}명 도전 · 1등은 ${firsts.map((t) => t.nm).join(", ")} 🎉`;
+  // 내 줄은 눈에 띄게
   [...$("bRankList").children].forEach((row, i) => {
-    if (ranked[i].nm === boardMe) { row.classList.add("me"); row.querySelector(".rn").insertAdjacentHTML("beforeend", "<small>⬅ 나</small>"); }
+    if (ME && !isTeacher() && ranked[i].raw === ME.sid) { row.classList.add("me"); row.querySelector(".rn").insertAdjacentHTML("beforeend", "<small>⬅ 나</small>"); }
   });
 }
-["bTopic", "bLevel", "bRounds"].forEach((id) => $(id).addEventListener("change", () => { boardMe = ""; renderBoard(); }));
-$("bClear").addEventListener("click", () => {
+["bTopic", "bLevel", "bRounds", "bPeriod"].forEach((id) => $(id).addEventListener("change", () => { save("hq-bperiod", $("bPeriod").value); loadBoard(); }));
+$("bScope").addEventListener("change", renderBoard);
+$("bReload").addEventListener("click", loadBoard);
+$("bClear").addEventListener("click", async () => {
   const g = GROUPS.find((x) => x.id === $("bTopic").value);
-  if (!confirm(`${g.nm} · ${$("bLevel").value}단계 · ${$("bRounds").value}문제 순위를 모두 지울까요?`)) return;
-  delete board[boardKey($("bTopic").value, $("bLevel").value, $("bRounds").value)];
-  save("hq-board", board); renderBoard();
+  if (!confirm(`${g.nm} · ${$("bLevel").value}단계 · ${$("bRounds").value}문제 혼자 하기 기록을 모든 반, 모든 기간 다 지울까요?\n(구글 시트 [혼자 기록]에서도 지워져요)`)) return;
+  try {
+    const r = await apiPost(SERVER, { action: "soloClear", pin: T.pin, topic: $("bTopic").value, level: +$("bLevel").value, rounds: +$("bRounds").value });
+    if (!r.ok) throw 0;
+  } catch (e) { alert("지우지 못했어요. 인터넷과 비밀번호를 확인해 주세요."); }
+  loadBoard();
 });
 $("openBoard").addEventListener("click", () => openBoard(opts.mode === "solo" ? opts.topic : "all", opts.level, opts.rounds));
-$("resBoard").addEventListener("click", () => openBoard(G.topic, G.level, G.rounds, G.player));
+$("resBoard").addEventListener("click", () => openBoard(G.topic, G.level, G.rounds));
 $("boardHome").addEventListener("click", () => { renderTopics(); show("home"); });
 
 /* ---------- 실시간 대결: 구글 앱스 스크립트 웹 앱에 점수를 모은다 ---------- */
@@ -1158,11 +1233,10 @@ function openJoin(room, api, mix) {
   const g = GROUPS.find((x) => x.id === c.topic);
   $("jCode").textContent = room;
   $("jSet").textContent = `${g.ic} ${g.nm} · ${c.level}단계 · ${c.rounds}문제 · ${mix ? "친구마다 다른 그림이 나와요!" : "모두 같은 그림이 나와요!"}`;
-  $("jName").value = load("hq-livename", "");
+  $("jName").value = myKey();
   show("join");
   return true;
 }
-$("jName").addEventListener("input", () => save("hq-livename", $("jName").value));
 $("jGo").addEventListener("click", async () => {
   const name = $("jName").value.trim(), info = $("jInfo");
   if (!name) { info.className = "tab-info bad"; info.textContent = "이름을 먼저 써요 ✏️"; $("jName").focus(); return; }
@@ -1173,6 +1247,7 @@ $("jGo").addEventListener("click", async () => {
     if (!res.ok && res.error === "name") { info.className = "tab-info bad"; info.textContent = `"${name}"은(는) 벌써 다른 탭에 있어요. 다른 이름(예: ${name}2)을 써 주세요.`; return; }
     // 한 번만 참여: 이 탭은 벌써 다른 이름으로 했거나, 이 이름으로 이미 풀기 시작했다
     if (!res.ok && res.error === "dev") { info.className = "tab-info bad"; info.textContent = `이 탭은 벌써 "${res.name}"(으)로 참여했어요 (${res.score}점). 대결은 한 번만 할 수 있어요 🙂`; return; }
+    if (!res.ok && res.error === "me") { info.className = "tab-info bad"; info.textContent = "학번·이름 등록이 지워졌어요. 🏠 처음 화면에서 다시 등록해 주세요."; return; }
     if (!res.ok && res.error === "closed") { info.className = "tab-info bad"; info.textContent = "🔒 지금은 닫혀 있어요. 선생님이 열면 다시 들어와요."; return; }
     if (!res.ok && res.error === "again") { info.className = "tab-info bad"; info.textContent = `"${name}"은(는) 벌써 참여했어요 (${res.score}점). 대결은 한 번만 할 수 있어요 🙂`; return; }
     if (!res.ok) throw new Error(res.error);
@@ -1186,12 +1261,13 @@ $("jGo").addEventListener("click", async () => {
 });
 
 /* ---------- 선생님 · 문지기 ----------
-   선생님 기기: 서버 주소 + 비밀번호(hq-api, hq-pin)를 넣어 두면 언제나 열린다.
-   학생 기기: 선생님 칠판의 QR(?api=…)을 한 번 찍어야 서버를 알고(hq-api-join), 정해진 시간에만 열린다. */
-let T = { api: load("hq-api", ""), pin: load("hq-pin", "") };
-let JOIN_API = load("hq-api-join", "");
-const isTeacher = () => !!(T.api && T.pin);
-$("apiUrl").value = T.api;
+   서버는 김희정 선생님 구글 앱스 스크립트 하나로 고정.
+   선생님 기기: 이름 + 비밀번호(hq-tname, hq-pin)를 넣어 두면 언제나 열린다.
+   학생 기기: 선생님 칠판의 QR(?in=1)을 한 번 찍고(hq-api-join), 학번·이름을 등록해야 하며, 정해진 시간에만 열린다. */
+const SERVER = "https://script.google.com/macros/s/AKfycbwL2sWuhENhxupVdW_KLWX3g8k6_Yj5MK3V4_9vLKywJ5_cgGxoQ1wuXQQxXRbq4oN9/exec";
+let T = { api: SERVER, pin: load("hq-pin", ""), name: load("hq-tname", "") };
+let JOIN_API = load("hq-api-join", "") ? SERVER : "";
+const isTeacher = () => !!T.pin;
 const DAYS = ["일", "월", "화", "수", "목", "금", "토"];
 const two = (n) => String(n).padStart(2, "0");
 const hm = (t) => { const d = new Date(t); return `${two(d.getHours())}:${two(d.getMinutes())}`; };
@@ -1214,17 +1290,25 @@ function showGate(kind, st = {}) {
   if (!["intro", "game", "result", "teach"].some((s) => !$(s).hidden)) show("gate");
 }
 // 지금 열려 있는지 서버에 묻기 (선생님 기기는 묻지 않고 연다)
+let whoThen = null; // 학번 등록을 마치면 이어서 할 일 (대결방 QR로 열렸을 때)
 async function gateCheck(then) {
   clearTimeout(gateTimer);
-  if (isTeacher()) { gateOpen = true; if (!$("gate").hidden) enterHome(); if (then) then(); return; }
+  if (isTeacher()) { gateOpen = true; if (!$("gate").hidden || !$("who").hidden) enterHome(); if (then) then(); return; }
   if (!JOIN_API) return showGate("qr");
   if (!gateOpen && !$("gate").hidden) showGate("wait");
   try {
-    const s = await fetchJson(`${apiFull(JOIN_API)}?action=status&t=${Date.now()}`, {}, 12000);
+    const s = await fetchJson(`${SERVER}?action=status&dev=${devId}&t=${Date.now()}`, {}, 12000);
     if (!s.ok || s.open === undefined) throw 0;
+    // 서버 명단과 맞추기: 선생님이 명단에서 지웠으면 다시 등록, 서버에 있으면 그 학번·이름으로
+    if (s.me !== undefined) {
+      const was = myKey();
+      ME = s.me ? { sid: s.me.sid, name: s.me.name } : null; save("hq-me", ME);
+      if (was !== myKey()) renderTopics();
+    }
+    if (s.open && !ME) { gateOpen = true; whoThen = then; return showWho(true); }
     if (s.open) {
       gateOpen = true;
-      if (!$("gate").hidden) enterHome();
+      if (!$("gate").hidden || !$("who").hidden) enterHome();
       if (then) then();
       // 닫히는 시각 즈음 다시 확인
       gateTimer = setTimeout(() => gateCheck(), Math.min(60000, Math.max(5000, (s.until || 0) - s.now + 2000)));
@@ -1240,26 +1324,57 @@ async function gateCheck(then) {
 $("gRetry").addEventListener("click", () => gateCheck());
 function enterHome() { renderTopics(); renderTabSetup(); show("home"); }
 
+/* 처음 화면: 학생 / 선생님 고르기, 학생은 학번·이름 등록 (한 기기에 한 번만) */
+function showWho(form) {
+  ["gate", "teach", "home", "live", "join", "board", "collect", "intro", "game", "result", "hall"].forEach((s) => ($(s).hidden = true));
+  $("who").hidden = false;
+  $("whoForm").hidden = !form; $("whoS").classList.toggle("on", !!form);
+  if (form) setTimeout(() => $("mSid").focus(), 50);
+}
+$("whoS").addEventListener("click", () => (JOIN_API ? showWho(true) : showGate("qr")));
+$("whoT").addEventListener("click", openTeach);
+$("mGo").addEventListener("click", async () => {
+  const sid = $("mSid").value.trim(), name = $("mName").value.trim().replace(/\s+/g, " "), info = $("mInfo");
+  const bad = (t) => { info.className = "tab-info bad"; info.innerHTML = t; };
+  if (!/^\d{4,6}$/.test(sid)) return bad("학번은 숫자 4~6자리로 써요. (예: 1학년 2반 3번 → 10203)");
+  if (!name) return bad("이름을 써요 ✏️");
+  if (!confirm(`학번 ${sid}, 이름 ${name}\n맞나요? 등록하면 이 기기에서는 바꿀 수 없어요.`)) return;
+  info.className = "tab-info"; info.textContent = "⏳ 등록하는 중…";
+  $("mGo").disabled = true;
+  try {
+    const r = await apiPost(SERVER, { action: "me", dev: devId, sid, name });
+    if (!r.ok && r.error === "dev") { ME = { sid: r.sid, name: r.name }; save("hq-me", ME); alert(`이 기기는 벌써 ${r.sid} ${r.name}(으)로 등록돼 있어요. 그 이름으로 해요.`); }
+    else if (!r.ok && r.error === "sid") return bad("이 학번은 벌써 <b>다른 기기</b>에서 등록했어요.<br>내 기기가 바뀌었으면 선생님께 말해 주세요.");
+    else if (!r.ok && r.error === "closed") return bad("🔒 지금은 닫혀 있어요. 게임이 열린 시간에 등록해요.");
+    else if (!r.ok) throw 0;
+    else { ME = { sid, name }; save("hq-me", ME); }
+    info.className = "tab-info"; info.innerHTML = "⚠ 한 번 등록하면 이 기기에서는 <b>학번·이름을 바꿀 수 없어요.</b> 정확히 써요!";
+    const then = whoThen; whoThen = null;
+    gateOpen = false; gateCheck(then);
+  } catch (e) { bad("서버에 연결하지 못했어요. 인터넷을 확인하고 다시 눌러 주세요 📶"); }
+  finally { $("mGo").disabled = false; }
+});
+
 /* 선생님 화면 */
 function openTeach() {
   $("tLoginBox").hidden = isTeacher(); $("tSched").hidden = !isTeacher();
-  $("tPin").value = "";
+  $("tPin").value = ""; $("tName").value = T.name || "";
   show("teach");
   if (isTeacher()) loadSched();
 }
 $("gTeacher").addEventListener("click", openTeach);
 $("homeTeach").addEventListener("click", openTeach);
 $("openTeach").addEventListener("click", openTeach);
-$("teachBack").addEventListener("click", () => (isTeacher() ? enterHome() : (show("gate"), gateCheck())));
+$("teachBack").addEventListener("click", () => (isTeacher() ? enterHome() : ME ? (show("gate"), gateCheck()) : showWho(false)));
 $("tHome").addEventListener("click", enterHome);
 $("tLogin").addEventListener("click", async () => {
-  const a = $("apiUrl").value.trim(), pin = $("tPin").value.trim(), box = $("apiInfo");
-  if (!a || !pin) { box.className = "tab-info bad"; box.textContent = "서버 주소와 비밀번호를 모두 넣어요."; return; }
+  const nm = $("tName").value.trim(), pin = $("tPin").value.trim(), box = $("apiInfo");
+  if (!nm || !pin) { box.className = "tab-info bad"; box.textContent = "이름과 비밀번호를 모두 넣어요."; return; }
   box.className = "tab-info"; box.textContent = "⏳ 확인하는 중…";
   try {
-    const r = await apiPost(a, { action: "pin", pin });
+    const r = await apiPost(SERVER, { action: "pin", pin });
     if (r.ok) {
-      T = { api: a, pin }; save("hq-api", a); save("hq-pin", pin);
+      T = { api: SERVER, pin, name: nm }; save("hq-pin", pin); save("hq-tname", nm);
       gateOpen = true; clearTimeout(gateTimer);
       box.className = "tab-info"; box.textContent = "";
       if (innerWidth > 560) makeHomeQr();
@@ -1269,14 +1384,15 @@ $("tLogin").addEventListener("click", async () => {
     box.textContent = r.error === "setpin" ? "앱스 스크립트 코드 맨 위 TEACHER_PIN 의 '0000'을 다른 숫자로 바꾸고 새 버전으로 배포해 주세요."
       : r.error === "pin" ? "비밀번호가 달라요." : "서버 코드가 예전 것이에요. 새 코드를 붙여 넣고 새 버전으로 배포해 주세요.";
   } catch (e) {
-    box.className = "tab-info bad"; box.textContent = "연결이 안 돼요. 주소가 …/exec 로 끝나는지, 배포할 때 '모든 사용자'를 골랐는지 확인해요.";
+    box.className = "tab-info bad"; box.textContent = "서버에 연결하지 못했어요. 인터넷을 확인하고 다시 눌러 주세요 📶";
   }
 });
 $("tLogout").addEventListener("click", () => {
   if (!confirm("이 기기를 선생님 기기에서 풀까요? 다음에 쓰려면 비밀번호를 다시 넣어야 해요.")) return;
-  if (!JOIN_API && T.api) { JOIN_API = apiShort(T.api); save("hq-api-join", JOIN_API); }
-  T = { api: "", pin: "" }; save("hq-pin", ""); save("hq-api", "");
-  gateOpen = false; show("gate"); gateCheck();
+  JOIN_API = SERVER; save("hq-api-join", "1");
+  T = { api: SERVER, pin: "", name: "" }; save("hq-pin", ""); save("hq-tname", "");
+  gateOpen = false;
+  if (ME) { show("gate"); gateCheck(); } else showWho(false);
 });
 
 /* 열리는 시간 */
@@ -1372,7 +1488,7 @@ function showLiveMake() {
   $("liveMake").hidden = false; $("liveRoom").hidden = true; $("lResult").hidden = true; $("liveCount").hidden = true;
 }
 function joinUrl(room) {
-  return `${location.origin}${location.pathname}?live=${room}${$("lMix").value === "1" ? "&mix=1" : ""}&api=${encodeURIComponent(apiShort($("apiUrl").value.trim()))}`;
+  return `${location.origin}${location.pathname}?live=${room}${$("lMix").value === "1" ? "&mix=1" : ""}&in=1`;
 }
 $("lMix").value = load("hq-livemix", "1");
 $("lMix").addEventListener("change", () => save("hq-livemix", $("lMix").value));
@@ -1412,7 +1528,7 @@ async function pollLive() {
   if (!liveRoom || liveBusyGet) return;
   liveBusyGet = true;
   try {
-    const res = await apiGet($("apiUrl").value.trim(), liveRoom);
+    const res = await apiGet(SERVER, liveRoom);
     if (!res.ok) throw 0;
     const before = livePlayers; livePlayers = res.players || {};
     renderLive(before);
@@ -1532,7 +1648,7 @@ $("hallHome").addEventListener("click", enterHome);
 /* 첫 화면 QR: 지금 주소(물음표 뒤는 빼고)를 QR로 */
 // 시작하기 옆 작은 QR: 누르면 크게. 이 컴퓨터 파일로 열었을 때는 학생 탭이 열 수 없으니 안내만
 const homeBase = location.origin + location.pathname;
-const homeLink = () => homeBase + (isTeacher() ? `?api=${encodeURIComponent(apiShort(T.api))}` : "");
+const homeLink = () => homeBase + (isTeacher() ? "?in=1" : "");
 const homeIsLocal = !/^https?:/.test(location.protocol) || /^(localhost|127\.)/.test(location.hostname);
 let homeSvg = "";
 async function makeHomeQr() {
@@ -1558,6 +1674,8 @@ $("qrPop").addEventListener("click", (e) => { if (e.target === $("qrPop")) $("qr
 function show(id) {
   // 닫힌 시간에 첫 화면으로 돌아오면 문지기로 (게임 중에는 끝까지 할 수 있다)
   if (id === "home" && !gateOpen && !isTeacher()) { id = "gate"; setTimeout(() => gateCheck(), 0); }
+  if (id === "home" && !isTeacher() && !ME) return showWho(!!JOIN_API);
+  $("who").hidden = true;
   ["gate", "teach", "home", "live", "join", "board", "collect", "intro", "game", "result", "hall"].forEach((s) => ($(s).hidden = s !== id));
   window.scrollTo(0, 0);
   if (id === "home") pollRooms();
@@ -1588,7 +1706,8 @@ function startGame(skipIntro) {
     topic: set.topic, level: +set.level, auto: set.auto === "1",
     cats: shuffle(pool).slice(0, rounds), i: 0, score: 0, log: [],
     team: opts.mode === "team", tab,
-    player: opts.mode === "solo" ? $("soloName").value.trim() : "", rounds: set.rounds,
+    player: opts.mode === "solo" ? (isTeacher() ? T.name || "" : ME ? ME.name : "") : "", rounds: set.rounds,
+    sid: opts.mode === "solo" && !isTeacher() && ME ? ME.sid : "",
     hints: Math.ceil(rounds / 3), // 힌트는 한 판에 5문제 2개 · 10문제 4개 · 15문제 5개
     teams: opts.mode === "team" ? TEAMS.slice(0, +opts.teams).map((t, k) => ({ ...t, nm: (teamNames[k] || "").trim() || t.nm, score: 0, right: 0 })) : [],
   };
@@ -1979,16 +2098,11 @@ function finish() {
   $("rTitle").textContent = (G.player ? `${G.player}, ` : "") + (ratio >= 0.8 ? "그림 박사 등장! 🏆" : ratio >= 0.6 ? "멋진 눈썰미! 🌟" : ratio >= 0.4 ? "잘했어요! 👍" : "다음엔 더 잘할 수 있어요! 💪");
   $("rSub").textContent = `${n}문제 중 ${right}문제 정답`;
   // 최고 점수는 이름마다 따로 (한 기기를 여러 학생이 같이 써도 섞이지 않게)
-  const bk = bestKey(G.topic, G.player);
-  if (!G.team && !G.tab) {
-    if (best[bk] && G.score > best[bk]) $("rSub").textContent += ` · 🎉 최고 점수 새 기록! (전에는 ${best[bk]}점)`;
-    if (!best[bk] || G.score > best[bk]) { best[bk] = G.score; save("hq-best", best); }
-  }
-  $("resBoard").hidden = !(G.player && !G.team && !G.tab);
-  if (G.player && !G.team && !G.tab) {
-    const rank = recordBoard(G.topic, G.level, G.rounds, G.player, G.score, right, n);
-    $("rSub").textContent += ` · 🏅 우리 반 ${rank}등!`;
-  }
+  const bk = bestKey(G.topic, G.sid ? myKey() : "");
+  if (!G.team && !G.tab && (!best[bk] || G.score > best[bk])) { best[bk] = G.score; save("hq-best", best); }
+  $("resBoard").hidden = !!(G.team || G.tab);
+  $("rRank").hidden = true;
+  if (G.sid && !G.team && !G.tab) soloSend({ topic: G.topic, level: G.level, rounds: +G.rounds, score: G.score, right });
   $("teamResult").hidden = !G.team;
   $("tabResult").hidden = !G.tab;
   $("soloHero").hidden = G.team || !!G.tab;
@@ -2025,6 +2139,23 @@ function finish() {
   if (G.team || ratio >= 0.6) confetti();
 }
 /* 순위: 점수가 같으면 같은 등수 */
+// 혼자 하기 점수를 서버 [혼자 기록]에 보내고, 우리 반·전체 몇 등인지 보여 준다
+async function soloSend(r0) {
+  const box = $("rRank");
+  box.hidden = false; box.textContent = "⏳ 순위 확인 중…";
+  for (let k = 0; k < 3; k++) {
+    try {
+      const r = await apiPost(SERVER, { action: "solo", dev: devId, sid: ME.sid, name: ME.name, ...r0 });
+      if (r.error === "closed") { box.textContent = "🔒 닫힌 시간이라 이번 점수는 순위에 올라가지 않았어요."; return; }
+      if (r.error === "me" || r.error === "dev") { box.textContent = "학번·이름 등록이 바뀌었어요. 🏠 처음 화면으로 가 주세요."; ME = null; save("hq-me", null); return; }
+      if (!r.ok) throw 0;
+      const nw = r.prev !== null && r0.score > r.prev ? ` · 🎉 최고 점수 새 기록! (전에는 ${r.prev}점)` : "";
+      box.innerHTML = `🏅 우리 반 <b>${r.cls.rank}등</b> / ${r.cls.n}명 · 🏫 전체 <b>${r.all.rank}등</b> / ${r.all.n}명<br><small>내 최고 점수 ${r.best}점${nw}</small>`;
+      return;
+    } catch (e) { await new Promise((ok) => setTimeout(ok, 3000)); }
+  }
+  box.textContent = "📶 점수를 보내지 못했어요. 인터넷을 확인해 주세요.";
+}
 function winnerText(list) {
   const firsts = list.filter((t) => t.rank === 1);
   return firsts.length > 1 ? `${firsts.map((t) => t.nm).join(", ")} 모둠이 공동 1등이에요 🎉` : `${firsts[0].ic} ${firsts[0].nm} 모둠이 1등이에요 🎉`;
@@ -2060,16 +2191,33 @@ $("again").addEventListener("click", () => { opts.topic = G.topic; startGame(tru
 $("toHome").addEventListener("click", () => {
   if (G && G.tab && G.tab.live) return show("join"); renderTopics(); document.body.classList.remove("team"); show("home"); });
 
+/* ---------- 앱으로 설치 (홈 화면에 아이콘) ---------- */
+let installEv = null;
+const standalone = matchMedia("(display-mode: standalone)").matches || navigator.standalone;
+const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+const showInstall = (on) => document.querySelectorAll(".install-btn").forEach((b) => (b.hidden = !on));
+if ("serviceWorker" in navigator && /^https?:/.test(location.protocol)) navigator.serviceWorker.register("sw.js").catch(() => {});
+window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); installEv = e; showInstall(true); });
+window.addEventListener("appinstalled", () => { installEv = null; showInstall(false); });
+if (isIos && !standalone) showInstall(true);
+document.querySelectorAll(".install-btn").forEach((b) => b.addEventListener("click", async () => {
+  if (installEv) { installEv.prompt(); await installEv.userChoice; installEv = null; showInstall(false); return; }
+  alert("아이패드·아이폰: 사파리 아래(또는 위)의 공유 버튼 ⬆ → '홈 화면에 추가'를 누르면 앱처럼 깔려요.\n갤럭시 탭: 크롬 오른쪽 위 ⋮ → '앱 설치' 또는 '홈 화면에 추가'를 눌러요.");
+}));
+
 renderTopics();
 renderTeamSetup();
 renderTabSetup();
-// QR로 열렸으면 서버 열쇠를 이 기기에 기억하고, 열린 시간이면 첫 화면(대결방 QR이면 입장 화면)으로
+// QR로 열렸으면 이 기기를 기억하고, 처음이면 학생/선생님 고르기, 열린 시간이면 첫 화면(대결방 QR이면 입장 화면)으로
 {
   const P = new URLSearchParams(location.search);
-  if (P.get("api") && !isTeacher()) { JOIN_API = P.get("api"); save("hq-api-join", JOIN_API); }
-  if (P.get("api")) history.replaceState(null, "", homeBase); // 주소창에 서버 열쇠를 남기지 않기
+  const fromQr = P.get("in") || P.get("api");
+  if (fromQr && !isTeacher()) { JOIN_API = SERVER; save("hq-api-join", "1"); }
+  if (fromQr) history.replaceState(null, "", homeBase); // 주소창을 깨끗하게
   const room = P.get("live"), mix = P.get("mix") === "1";
-  gateCheck(room ? () => { if (!LIVE) openJoin(room, JOIN_API || T.api, mix); } : null);
+  const then = room ? () => { if (!LIVE) openJoin(room, SERVER, mix); } : null;
+  if (!isTeacher() && !ME && !JOIN_API) showWho(false);
+  else gateCheck(then);
   if (isTeacher() && innerWidth > 560) makeHomeQr();
 }
 </script>
