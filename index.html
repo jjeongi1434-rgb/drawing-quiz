@@ -302,6 +302,11 @@
 
   .board-link { text-align: center; margin: 0 0 6px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
   @media (max-width: 560px) { .qr-mini { display: none; } }
+  /* 관리자 칠판: 게임 주소를 늘 한쪽에 */
+  .site-tag { position: fixed; left: 14px; bottom: 14px; z-index: 40; border: 2px solid var(--line); background: rgba(255,255,255,.92);
+    border-radius: 999px; padding: 7px 16px; font-family: "Jua"; font-size: 19px; color: var(--ink); box-shadow: var(--shadow); cursor: pointer; }
+  .site-tag small { font-family: "Gowun Dodum"; font-size: 13px; opacity: .6; margin-left: 6px; }
+  @media print { .site-tag { display: none; } }
   .gate-panel { text-align: center; max-width: 520px; margin: 0 auto 16px; padding: 30px 20px; }
   .gate-ic { font-size: 64px; line-height: 1.1; }
   .gate-h { font-family: "Jua"; font-weight: normal; font-size: 28px; margin: 8px 0 6px; }
@@ -872,6 +877,7 @@
     <p class="credit">그림 데이터: Google Quick, Draw! Dataset (CC BY 4.0)</p>
   </section>
 </div>
+<button id="siteTag" class="site-tag" hidden title="누르면 QR이 크게 나와요"></button>
 <div id="printArea"></div>
 
 <script>
@@ -1372,7 +1378,7 @@ async function gateCheck(then) {
   }
 }
 $("gRetry").addEventListener("click", () => gateCheck());
-function enterHome() { renderTopics(); renderTabSetup(); show("home"); }
+function enterHome() { renderTopics(); renderTabSetup(); renderSiteTag(); show("home"); }
 
 /* 처음 화면: 학생 / 선생님 고르기, 학생은 학번·이름 등록 (한 기기에 한 번만) */
 let whoKind = "s"; // s: 학생, t: 게임에 참여하는 선생님
@@ -1460,6 +1466,7 @@ $("tLogout").addEventListener("click", () => {
   JOIN_API = SERVER; save("hq-api-join", "1");
   T = { api: SERVER, pin: "", name: "" }; save("hq-pin", ""); save("hq-tname", "");
   gateOpen = false;
+  renderSiteTag();
   if (ME) { show("gate"); gateCheck(); } else showWho(false);
 });
 
@@ -1782,6 +1789,12 @@ async function makeHomeQr() {
     $("qrMiniBox").innerHTML = homeSvg;
   } catch (e) { $("qrMiniBox").innerHTML = "QR을 못 만들었어요 (인터넷 확인)"; }
 }
+// 관리자 칠판 왼쪽 아래에 게임 주소 (누르면 QR 크게)
+function renderSiteTag() {
+  $("siteTag").hidden = !isTeacher() || homeIsLocal;
+  $("siteTag").innerHTML = `🌐 ${location.host}${location.pathname.replace(/index\.html$/, "").replace(/\/$/, "")}<small>📷 QR</small>`;
+}
+$("siteTag").addEventListener("click", async () => { if (!homeSvg) await makeHomeQr(); $("qrMini").click(); });
 $("qrMini").addEventListener("click", () => {
   $("qrUrl").textContent = homeBase;
   $("homeQr").innerHTML = homeSvg || `<div class="qr-fail">${homeIsLocal
@@ -2363,6 +2376,7 @@ renderTabSetup();
   if (!isTeacher() && !ME && !JOIN_API) showWho(false);
   else gateCheck(then);
   if (isTeacher() && innerWidth > 560) makeHomeQr();
+  renderSiteTag();
 }
 </script>
 </body>
