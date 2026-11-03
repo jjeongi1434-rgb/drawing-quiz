@@ -287,7 +287,7 @@
   .lrow.up { animation: pop .4s ease-out; }
   .live-actions { display: flex; gap: 10px; flex-wrap: wrap; }
   /* 칠판: 대결방 카드 여러 개 (작은 QR · 1~3등) */
-  .room-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 400px), 1fr)); gap: 14px; margin-bottom: 16px; }
+  .room-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 400px), 1fr)); gap: 14px; margin-bottom: 16px; }
   /* 넓은 칠판에서는 화면을 넓게 써서 방을 나란히 */
   @media (min-width: 1000px) { .room-cards { margin-inline: calc(50% - min(720px, 50vw - 30px)); } }
   .lcard { padding: 14px; display: grid; gap: 10px; border-color: var(--lvd); }
@@ -307,6 +307,9 @@
   .lc-top .lrow .ls { font-size: 20px; }
   .lc-top .live-empty { padding: 18px 8px; font-size: 15px; }
   .lc-more { font-size: 14px; color: var(--ink-soft); text-align: center; }
+  .lc-sub { font-family: "Jua"; font-size: 16px; color: var(--ink-soft); margin-top: 2px; }
+  .lc-sub small { font-family: "Gowun Dodum"; font-size: 13px; }
+  .lc-sub.t { margin-top: 8px; padding-top: 8px; border-top: 2px dashed var(--line); }
   .lc-btns { display: flex; gap: 8px; flex-wrap: wrap; }
   .lc-btns .go { flex: 1; }
   @media (max-width: 560px) { .lc-body { grid-template-columns: 1fr; } .lc-qr { width: 150px; margin: 0 auto; } }
@@ -724,8 +727,10 @@
     </div>
     <div id="lResult" hidden>
       <div class="res-hero"><h1>🏆 실시간 대결 결과</h1><p id="lSub"></p></div>
-      <div id="lPodium" class="podium"></div>
-      <div class="panel"><div id="lRankList" class="rank-list"></div></div>
+      <div id="lSBox"><h2 class="sub-h">🙋 학생 순위</h2><div id="lPodium" class="podium"></div>
+        <div class="panel"><div id="lRankList" class="rank-list"></div></div></div>
+      <div id="lTBox" hidden><h2 class="sub-h">🧑‍🏫 선생님 순위</h2><div id="ltPodium" class="podium"></div>
+        <div class="panel"><div id="ltRankList" class="rank-list"></div></div></div>
       <div class="btns"><button id="lBack" class="go soft">📡 대결방으로 돌아가기</button><button id="lHall" class="go soft">🏅 명예의 전당</button></div>
     </div>
   </section>
@@ -869,7 +874,7 @@
     <div id="tabResult" hidden>
       <div id="tabCard" class="tab-card"></div>
       <div id="liveRankBox" class="panel live-rank" hidden>
-        <h2 class="step-h">📡 우리 반 순위 <span id="lrUpd" class="upd"></span></h2>
+        <h2 class="step-h"><span id="lrH">📡 순위</span> <span id="lrUpd" class="upd"></span></h2>
         <div id="lrPodium" class="podium"></div>
         <div id="lrList" class="rank-list"></div>
       </div>
@@ -958,6 +963,7 @@ const TCLS = "000";
 const isTsid = (sid) => /^000\d\d$/.test(String(sid));
 const meTeacher = () => !!(ME && isTsid(ME.sid));
 // 칠판·순위에 보일 이름: "10203 민지" 그대로, 선생님은 "김OO 선생님"
+const isTnm = (nm) => isTsid(String(nm).split(" ")[0]);
 const showNm = (nm) => String(nm).replace(/^000\d\d (.+)$/, "$1 선생님");
 
 /* 모둠 대결: 모둠 모양과 색 */
@@ -1249,7 +1255,10 @@ async function liveMyRank() {
     try {
       const res = await apiGet(LIVE.api, LIVE.room);
       if (!res.ok) throw 0;
-      const list = Object.entries(res.players || {}).map(([nm, p]) => ({ ...avatar(nm), raw: nm, nm: esc(showNm(nm)), score: p.score, right: p.right, done: p.done }));
+      const mineT = isTnm(LIVE.name);
+      const list = Object.entries(res.players || {}).filter(([nm]) => isTnm(nm) === mineT)
+        .map(([nm, p]) => ({ ...avatar(nm), raw: nm, nm: esc(showNm(nm)), score: p.score, right: p.right, done: p.done }));
+      $("lrH").textContent = mineT ? "📡 선생님 순위" : "📡 학생 순위";
       const ranked = renderRanking(list, "lrPodium", "lrList");
       const me = ranked.find((p) => p.raw === LIVE.name);
       [...$("lrList").children].forEach((row, i) => {
@@ -1671,8 +1680,10 @@ async function pollRoom(r) {
   r.busy = false;
   if (roomOf(r.code)) renderRoom(r);
 }
-function rankOf(r) {
-  const list = Object.entries(r.players).map(([nm, p]) => ({ ...avatar(nm), nm, ...p })).sort((a, b) => b.score - a.score || b.step - a.step);
+// 학생과 선생님은 순위를 따로 매긴다
+function rankOf(r, teacher) {
+  const list = Object.entries(r.players).filter(([nm]) => isTnm(nm) === teacher)
+    .map(([nm, p]) => ({ ...avatar(nm), nm, ...p })).sort((a, b) => b.score - a.score || b.step - a.step);
   list.forEach((p) => (p.rank = 1 + list.filter((o) => o.score > p.score).length));
   return list;
 }
@@ -1700,21 +1711,23 @@ function renderRooms() {
 // 방 하나의 1~3등 (2.5초마다)
 function renderRoom(r) {
   const card = $("liveRooms").querySelector(`[data-room="${r.code}"]`); if (!card) return;
-  const list = rankOf(r), medal = { 1: "🥇", 2: "🥈", 3: "🥉" };
-  card.querySelector(".lc-n").textContent = `👥 ${list.length}명 · 끝 ${list.filter((p) => p.done).length}명`;
+  const kids = rankOf(r, false), tchs = rankOf(r, true), all = kids.concat(tchs), medal = { 1: "🥇", 2: "🥈", 3: "🥉" };
+  card.querySelector(".lc-n").textContent = `👥 ${all.length}명 · 끝 ${all.filter((p) => p.done).length}명`;
   const upd = card.querySelector(".upd");
   upd.className = r.off ? "upd off" : "upd"; upd.textContent = r.off ? "· 연결이 잠깐 끊겼어요" : "";
   const total = ROOMS.reduce((n, x) => n + Object.keys(x.players).length, 0);
   $("liveCount").hidden = !ROOMS.length; $("liveCount").textContent = `방 ${ROOMS.length} · 👥 ${total}명`;
-  if (!list.length) { card.querySelector(".lc-top").innerHTML = `<div class="live-empty">아직 아무도 안 들어왔어요.<br>QR을 찍으면 여기에 나와요! 📷</div>`; return; }
-  const top = list.slice(0, 3);
-  card.querySelector(".lc-top").innerHTML = top.map((p) => {
+  if (!all.length) { card.querySelector(".lc-top").innerHTML = `<div class="live-empty">아직 아무도 안 들어왔어요.<br>QR을 찍으면 여기에 나와요! 📷</div>`; return; }
+  const rows = (list) => list.slice(0, 3).map((p) => {
     const changed = !r.before[p.nm] || r.before[p.nm].score !== p.score;
     return `<div class="lrow${changed ? " up" : ""}" style="background:${p.bg}">
       <span class="lk">${medal[p.rank] || p.rank}</span><span class="li">${p.ic}</span>
       <span class="ln">${esc(showNm(p.nm))}${p.done ? " ✔" : ""}<small>${p.done ? "끝!" : `${p.step} / ${p.total}문제`}</small></span>
       <span class="ls">${p.score}점</span></div>`;
   }).join("") + (list.length > 3 ? `<div class="lc-more">그 밖에 ${list.length - 3}명이 도전 중</div>` : "");
+  card.querySelector(".lc-top").innerHTML =
+    `<div class="lc-sub">🙋 학생 <small>${kids.length}명</small></div>` + (kids.length ? rows(kids) : `<div class="lc-more">아직 학생이 없어요</div>`) +
+    (tchs.length ? `<div class="lc-sub t">🧑‍🏫 선생님 <small>${tchs.length}명</small></div>` + rows(tchs) : "");
 }
 $("liveRooms").addEventListener("click", async (e) => {
   const b = e.target.closest("[data-act]"); if (!b) return;
@@ -1735,11 +1748,14 @@ $("liveRooms").addEventListener("click", async (e) => {
   }
 });
 function showLiveResult(r) {
-  const list = Object.entries(r.players).map(([nm, p]) => ({ ...avatar(nm), nm: nm.replace(/</g, "&lt;"), score: p.score, right: p.right }));
-  if (list.length < 1) return alert("아직 아무도 안 들어왔어요.");
-  const ranked = renderRanking(list, "lPodium", "lRankList");
-  const firsts = ranked.filter((t) => t.rank === 1);
-  $("lSub").textContent = `${roomName(r.code)} · ${list.length}명 도전 · 1등은 ${firsts.map((t) => t.nm).join(", ")} 🎉`;
+  const all = Object.entries(r.players).map(([nm, p]) => ({ ...avatar(nm), t: isTnm(nm), nm: esc(showNm(nm)), score: p.score, right: p.right }));
+  if (all.length < 1) return alert("아직 아무도 안 들어왔어요.");
+  // 학생 순위와 선생님 순위를 따로
+  const kids = all.filter((p) => !p.t), tchs = all.filter((p) => p.t), say = [];
+  $("lSBox").hidden = !kids.length; $("lTBox").hidden = !tchs.length;
+  if (kids.length) say.push(`학생 ${kids.length}명 · 1등 ${renderRanking(kids, "lPodium", "lRankList").filter((t) => t.rank === 1).map((t) => t.nm).join(", ")}`);
+  if (tchs.length) say.push(`선생님 ${tchs.length}명 · 1등 ${renderRanking(tchs, "ltPodium", "ltRankList").filter((t) => t.rank === 1).map((t) => t.nm).join(", ")}`);
+  $("lSub").innerHTML = `${roomName(r.code)}<br>${say.join("<br>")} 🎉`;
   $("liveRooms").hidden = true; $("liveMake").hidden = true; $("lResult").hidden = false;
   resRoom = r.code;
   window.scrollTo(0, 0);
