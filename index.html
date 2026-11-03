@@ -1328,6 +1328,17 @@ $("jGo").addEventListener("click", async () => {
     if (!res.ok && res.error === "dev") { info.className = "tab-info bad"; info.textContent = `이 탭은 벌써 "${res.name}"(으)로 참여했어요 (${res.score}점). 대결은 한 번만 할 수 있어요 🙂`; return; }
     if (!res.ok && res.error === "me") { ME = null; save("hq-me", null); renderJoinMe(); info.className = "tab-info bad"; info.textContent = "학번·이름 등록이 지워졌어요. 위에 다시 쓰고 들어가요."; return; }
     if (!res.ok && res.error === "closed") { info.className = "tab-info bad"; info.textContent = "🔒 지금은 닫혀 있어요. 선생님이 열면 다시 들어와요."; return; }
+    if (!res.ok && res.error === "busy") {
+      info.className = "tab-info bad";
+      info.innerHTML = `⚠ 아직 끝내지 않은 대결방이 있어요: <b>${esc(roomName(res.room))}</b> (${res.step}문제까지 ${res.score}점)<br>
+        그 방을 끝까지 풀어야 다른 방에 들어갈 수 있어요.<br><button id="jQuitOld" class="link-btn">🚪 그 방은 여기까지 점수로 끝내기</button>`;
+      $("jQuitOld").addEventListener("click", async () => {
+        if (!confirm(`${roomName(res.room)}은(는) ${res.score}점으로 끝나고, 다시 들어갈 수 없어요.\n그 방을 끝내고 이 방에 들어갈까요?`)) return;
+        try { await apiPost(LIVE.api, { action: "score", room: res.room, name: res.name, dev: devId, score: res.score, right: res.right, step: res.step, quit: true }); } catch (e) {}
+        $("jGo").click();
+      });
+      return;
+    }
     if (!res.ok && res.error === "again") { info.className = "tab-info bad"; info.textContent = `"${name}"은(는) 벌써 참여했어요 (${res.score}점). 대결은 한 번만 할 수 있어요 🙂`; return; }
     if (!res.ok) throw new Error(res.error);
     if (res.done) { info.className = "tab-info good"; info.textContent = `벌써 끝냈어요! 내 점수는 ${res.score}점이에요. 칠판을 봐요 📺`; return; }
@@ -1724,7 +1735,7 @@ function renderRoom(r) {
     const changed = !r.before[p.nm] || r.before[p.nm].score !== p.score;
     return `<div class="lrow${changed ? " up" : ""}" style="background:${p.bg}">
       <span class="lk">${medal[p.rank] || p.rank}</span><span class="li">${p.ic}</span>
-      <span class="ln">${esc(showNm(p.nm))}${p.done ? " ✔" : ""}<small>${p.done ? "끝!" : `${p.step} / ${p.total}문제`}</small></span>
+      <span class="ln">${esc(showNm(p.nm))}${p.quit ? "" : p.done ? " ✔" : ""}<small>${p.quit ? `🚪 ${p.step}문제에서 나감` : p.done ? "끝!" : `${p.step} / ${p.total}문제`}</small></span>
       <span class="ls">${p.score}점</span></div>`;
   }).join("") + (list.length > 3 ? `<div class="lc-more">그 밖에 ${list.length - 3}명이 도전 중</div>` : "");
   card.querySelector(".lc-top").innerHTML =
@@ -2299,10 +2310,15 @@ $("skipBtn").addEventListener("click", () => { if (!Q.done) answer(null, null); 
 
 $("quit").addEventListener("click", () => {
   if (G && G.tab && G.tab.live) {
-    if (!confirm("대결을 그만둘까요? 지금까지 점수만 칠판에 남고, 다시 들어올 수 없어요.")) return;
+    if (!confirm(`⚠ 실시간 대결 중이에요!\n\n지금 나가면 여기까지 점수(${G.score}점)로 끝나요.\n이 대결방에는 다시 들어올 수 없어요.\n\n정말 나갈까요?`)) return;
+    liveSend({ score: G.score, right: G.log.filter((r) => r && r.ok).length, step: G.log.filter(Boolean).length, done: false, quit: true });
     clearTimers(); G = null; Q = null; return show("join");
   }
   clearTimers(); G = null; Q = null; renderTopics(); document.body.classList.remove("team"); show("home"); });
+// 대결 중에 창을 닫거나 새로 고치려 하면 브라우저가 한 번 더 묻는다
+window.addEventListener("beforeunload", (e) => {
+  if (G && G.tab && G.tab.live && !$("game").hidden) { e.preventDefault(); e.returnValue = ""; }
+});
 $("start").addEventListener("click", () => startGame());
 window.addEventListener("resize", () => { if (!$("game").hidden) sizeCanvas(); });
 
