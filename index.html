@@ -751,8 +751,10 @@
     <div id="hEmpty" class="board-empty" hidden></div>
     <div id="hShow" hidden>
       <div class="res-hero"><h1 id="hTitle"></h1><p id="hSub"></p></div>
-      <div id="hPodium" class="podium"></div>
-      <div class="panel"><div id="hRankList" class="rank-list"></div></div>
+      <div id="hSBox"><h2 class="sub-h">🙋 학생 순위</h2><div id="hPodium" class="podium"></div>
+        <div class="panel"><div id="hRankList" class="rank-list"></div></div></div>
+      <div id="hTBox" hidden><h2 class="sub-h">🧑‍🏫 선생님 순위</h2><div id="htPodium" class="podium"></div>
+        <div class="panel"><div id="htRankList" class="rank-list"></div></div></div>
     </div>
   </section>
 
@@ -1811,7 +1813,7 @@ function renderHall() {
   }
   $("hRoom").innerHTML = `<option value="*">모든 방</option>` + list0.map(([k, r]) => {
     const g = GROUPS.find((x) => x.id === readCode(r.room)?.topic);
-    return `<option value="${k}">${r.d.getMonth() + 1}/${r.d.getDate()} ${String(r.d.getHours()).padStart(2, "0")}:${String(r.d.getMinutes()).padStart(2, "0")} · ${r.room}번 방 ${g ? g.ic : ""} (${r.n}명)</option>`;
+    return `<option value="${k}">${r.d.getMonth() + 1}/${r.d.getDate()} ${String(r.d.getHours()).padStart(2, "0")}:${String(r.d.getMinutes()).padStart(2, "0")} · ${readCode(r.room) ? roomName(r.room) : ""} ${r.room}번 (${r.n}명)</option>`;
   }).join("");
   $("hRoom").value = hallRoom;
   const oneRoom = hallRoom !== "*" ? rooms[hallRoom] : null;
@@ -1824,21 +1826,29 @@ function renderHall() {
     else if (c.rounds !== rounds || (topic !== "*" && c.topic !== topic) || (level !== "*" && c.level !== level)) return;
     if (!best[nm] || score > best[nm].score) best[nm] = { score, right, t, topic: c.topic };
   });
-  const list = Object.entries(best).map(([nm, r]) => ({ ...avatar(nm), nm: esc(showNm(nm)), ...r }));
+  const list = Object.entries(best).map(([nm, r]) => ({ ...avatar(nm), nm: esc(showNm(nm)), ...r, tch: isTnm(nm) }));
   $("hEmpty").hidden = list.length > 0; $("hShow").hidden = list.length === 0;
   if (!list.length) { $("hEmpty").innerHTML = "🏅 이 조건으로 끝까지 푼 기록이 아직 없어요.<br><b>기간</b>이나 <b>주제</b>를 바꿔 보세요!"; return; }
   const g = GROUPS.find((x) => x.id === topic);
   if (oneRoom) {
     const c = readCode(oneRoom.room), rg = GROUPS.find((x) => x.id === c.topic);
-    $("hTitle").textContent = `${oneRoom.d.getMonth() + 1}/${oneRoom.d.getDate()} ${oneRoom.room}번 방 · ${rg.ic} ${rg.nm} · ${c.level}단계 · ${c.rounds}문제`;
+    $("hTitle").textContent = `${oneRoom.d.getMonth() + 1}/${oneRoom.d.getDate()} ${roomName(oneRoom.room)} · ${oneRoom.room}번 · ${c.rounds}문제`;
   } else
   $("hTitle").textContent = `${{ today: "오늘", week: "최근 7일", month: "최근 30일", all: "전체" }[period]} · ${g ? `${g.ic} ${g.nm}` : "모든 주제"} · ${level === "*" ? "모든 단계" : level + "단계"} · ${rounds}문제`;
-  const ranked = renderRanking(list, "hPodium", "hRankList");
-  $("hSub").textContent = `${list.length}명 · 1등은 ${ranked.filter((t) => t.rank === 1).map((t) => t.nm).join(", ")} 🎉`;
-  [...$("hRankList").children].forEach((row, i) => {
-    const r = ranked[i], d = new Date(r.t), tg = GROUPS.find((x) => x.id === r.topic);
-    row.querySelector(".rn").insertAdjacentHTML("beforeend", `<small>📅 ${d.getMonth() + 1}/${d.getDate()}${topic === "*" ? ` · ${tg.ic} ${tg.nm}` : ""}</small>`);
+  // 학생 순위와 선생님 순위를 따로
+  const say = [];
+  [[false, "학생", "hSBox", "hPodium", "hRankList"], [true, "선생님", "hTBox", "htPodium", "htRankList"]].forEach(([t, who, box, pod, rank]) => {
+    const part = list.filter((p) => p.tch === t);
+    $(box).hidden = !part.length;
+    if (!part.length) return;
+    const ranked = renderRanking(part, pod, rank);
+    say.push(`${who} ${part.length}명 · 1등 ${ranked.filter((x) => x.rank === 1).map((x) => x.nm).join(", ")}`);
+    [...$(rank).children].forEach((row, i) => {
+      const r = ranked[i], d = new Date(r.t), tg = GROUPS.find((x) => x.id === r.topic);
+      row.querySelector(".rn").insertAdjacentHTML("beforeend", `<small>📅 ${d.getMonth() + 1}/${d.getDate()}${topic === "*" ? ` · ${tg.ic} ${tg.nm}` : ""}</small>`);
+    });
   });
+  $("hSub").innerHTML = `${say.join("<br>")} 🎉`;
 }
 ["hPeriod", "hTopic", "hLevel", "hRounds"].forEach((id) => $(id).addEventListener("change", renderHall));
 $("hRoom").addEventListener("change", () => { hallRoom = $("hRoom").value; renderHall(); });
